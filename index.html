@@ -600,4 +600,131 @@ function goToStep3(){
       <span>🪜</span> Спуститься по лестнице, пригнувшись, с мокрым полотенцем на лице
     </div>
     <div class="action-option" onclick="exitBuilding('elevator')">
-     
+      <span>🛗</span> Вызвать лифт и спуститься на нём
+    </div>
+    <div class="action-option" onclick="exitBuilding('window')">
+      <span>🪟</span> Разбить окно и прыгнуть вниз
+    </div>
+    <div class="action-option" onclick="exitBuilding('wait')">
+      <span>⏳</span> Остаться в кабинете и ждать спасателей
+    </div>
+  `;
+}
+
+/* =========================================================
+   ВЫХОД
+   ========================================================= */
+function exitBuilding(action){
+  if(action === 'stairs'){
+    win();
+  } else if(action === 'elevator'){
+    die('Во время пожара лифт — смертельная ловушка. Он может остановиться на горящем этаже или отключиться из-за перебоев с электричеством.');
+  } else if(action === 'window'){
+    die('Прыжок с 5-го этажа несовместим с жизнью. Разбивать окно можно только в крайнем случае и только для подачи сигнала, а не для прыжка.');
+  } else if(action === 'wait'){
+    die('Ты остался в кабинете, но дым уже проник внутрь. Ожидание без подачи сигнала и защиты дыхания привело к отравлению угарным газом.');
+  }
+}
+
+/* =========================================================
+   ТАЙМЕР
+   ========================================================= */
+function startTimer(){
+  if(game.timerId) clearInterval(game.timerId);
+  game.timerId = setInterval(() => {
+    if(!game.active) return;
+    game.timeLeft--;
+    updateTimerDisplay();
+    
+    if(game.timeLeft <= 60){
+      $('timerStat').classList.add('danger');
+    }
+    
+    if(game.timeLeft <= 0){
+      clearInterval(game.timerId);
+      die('Время вышло! Дым заполнил кабинет, и ты потерял сознание. Пожарные не успели.');
+    }
+  }, 1000);
+}
+
+function updateTimerDisplay(){
+  const m = Math.floor(game.timeLeft / 60);
+  const s = game.timeLeft % 60;
+  $('timerStat').textContent = `⏱ ${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+
+/* =========================================================
+   ПОБЕДА / СМЕРТЬ
+   ========================================================= */
+function win(){
+  game.active = false;
+  clearInterval(game.timerId);
+  $('timerStat').classList.remove('danger');
+  
+  const timeSpent = 300 - game.timeLeft;
+  const m = Math.floor(timeSpent / 60);
+  const s = timeSpent % 60;
+  
+  showModal(
+    '🎉 Ты спасён!',
+    `Ты выбрался из горящего здания за ${m} мин ${s} сек, соблюдая все правила пожарной безопасности. Ты молодец!`,
+    '🏆',
+    [
+      { text: '🔄 Играть снова', action: () => { closeModal(); resetGame(); }, cls: 'green' }
+    ]
+  );
+}
+
+function die(reason){
+  game.active = false;
+  clearInterval(game.timerId);
+  
+  showModal(
+    '💀 Ты погиб',
+    reason,
+    '🔥',
+    [
+      { text: '🔄 Попробовать снова', action: () => { closeModal(); resetGame(); }, cls: 'fire' }
+    ]
+  );
+}
+
+/* =========================================================
+   МОДАЛЬНОЕ ОКНО
+   ========================================================= */
+function showModal(title, text, emoji, buttons){
+  $('modalContent').innerHTML = `
+    <div class="modal-emoji">${emoji}</div>
+    <h2>${title}</h2>
+    <p>${text}</p>
+    <div class="btn-row">
+      ${buttons.map(b => `<button class="btn ${b.cls||''}" onclick="handleModalBtn('${b.text}')">${b.text}</button>`).join('')}
+    </div>
+  `;
+  window._modalButtons = buttons;
+  $('modalOverlay').classList.add('show');
+}
+
+function handleModalBtn(text){
+  const btn = window._modalButtons.find(b => b.text === text);
+  if(btn && btn.action) btn.action();
+}
+
+function closeModal(){
+  $('modalOverlay').classList.remove('show');
+}
+
+/* =========================================================
+   РЕСТАРТ
+   ========================================================= */
+function resetGame(){
+  game.active = false;
+  if(game.timerId) clearInterval(game.timerId);
+  closeModal();
+  $('gameScreen').style.display = 'none';
+  $('startScreen').style.display = 'block';
+  $('timerStat').classList.remove('danger');
+}
+</script>
+</body>
+</html>
