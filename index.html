@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Food Vocabulary B2 — Speed Tap</title>
+<title>Food Vocabulary B2 — Speed Tap (10 сек)</title>
 <style>
   :root{
     --ink:#1e293b; --muted:#64748b; --line:#e2e8f0;
@@ -107,89 +107,45 @@
     color:var(--red);font-weight:900;
   }
   .plate.disabled{cursor:default;opacity:.55}
-  .plate.hint{
-    animation:hintPulse 1s infinite;
-    border-color:#fbbf24;
-  }
   @keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.08)}100%{transform:scale(1)}}
   @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
-  @keyframes hintPulse{
-    0%,100%{box-shadow:0 4px 12px -4px rgba(0,0,0,.15)}
-    50%{box-shadow:0 0 0 6px rgba(251,191,36,.35)}
-  }
 
-  /* Ticker */
+  /* Ticker / Word Display */
   .ticker-wrap{
     position:relative;
     background:#0f172a;
     border-radius:16px;
     padding:6px;
     box-shadow:0 12px 30px -12px rgba(15,23,42,.6);
-    overflow:hidden;
+    margin-bottom:14px;
   }
   .ticker{
     background:linear-gradient(90deg,#1e1b4b,#312e81,#1e1b4b);
     border-radius:12px;
-    padding:18px 0;
+    padding:16px 20px;
     position:relative;
-    overflow:hidden;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    min-height:100px;
   }
-  .ticker::before,.ticker::after{
-    content:"";position:absolute;top:0;bottom:0;width:80px;z-index:3;pointer-events:none;
+  .word-display{
+    font-size:clamp(24px,5vw,36px);font-weight:900;letter-spacing:.06em;
+    color:#c7d2fe;text-transform:uppercase;text-align:center;
+    transition:color .2s, transform .2s;
   }
-  .ticker::before{left:0;background:linear-gradient(90deg,#1e1b4b,transparent)}
-  .ticker::after{right:0;background:linear-gradient(270deg,#1e1b4b,transparent)}
-  .ticker-track{
-    display:flex;gap:0;
-    animation:scroll 30s linear infinite;
-    will-change:transform;
-  }
-  .ticker-track.paused{animation-play-state:paused}
-  .ticker-item{
-    flex:0 0 auto;
-    padding:0 40px;
-    font-size:22px;font-weight:900;letter-spacing:.05em;
-    color:#c7d2fe;
-    white-space:nowrap;
-    text-transform:uppercase;
-    position:relative;
-  }
-  .ticker-item::after{
-    content:"•";position:absolute;right:0;top:50%;transform:translateY(-50%);
-    color:#4f46e5;font-size:14px;
-  }
-  .ticker-item:last-child::after{display:none}
-  @keyframes scroll{
-    0%{transform:translateX(0)}
-    100%{transform:translateX(-50%)}
-  }
+  .word-display.ok{color:#4ade80;transform:scale(1.05)}
+  .word-display.err{color:#f87171;animation:shake .35s ease}
 
-  /* Center focus window */
-  .focus-window{
-    position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
-    z-index:5;
-    background:#fff;
-    border:4px solid #fbbf24;
-    border-radius:12px;
-    padding:8px 22px;
-    box-shadow:0 0 0 4px #1e1b4b, 0 12px 30px -8px rgba(0,0,0,.6);
-    min-width:180px;text-align:center;
-    pointer-events:none;
+  /* 10-second progress bar */
+  .time-bar-track{
+    width:100%;height:8px;background:rgba(255,255,255,.15);
+    border-radius:99px;margin-top:12px;overflow:hidden;
   }
-  .focus-window .fw-label{
-    font-size:9px;font-weight:800;letter-spacing:.15em;color:#94a3b8;text-transform:uppercase;
-    margin-bottom:2px;
+  .time-bar-fill{
+    height:100%;width:100%;border-radius:99px;
+    background:linear-gradient(90deg,#4ade80,#fbbf24);
+    transition:width 0.05s linear, background 0.3s;
   }
-  .focus-window .fw-word{
-    font-size:24px;font-weight:900;color:#1e1b4b;
-    text-transform:uppercase;letter-spacing:.04em;
-    min-height:30px;
-    transition:color .2s;
-  }
-  .focus-window.ok{border-color:var(--green);animation:pop .3s ease}
-  .focus-window.ok .fw-word{color:var(--green)}
-  .focus-window.err{border-color:var(--red);animation:shake .35s ease}
-  .focus-window.err .fw-word{color:var(--red)}
+  .time-bar-fill.danger{background:linear-gradient(90deg,#f87171,#dc2626)}
 
   /* Controls */
   .controls{
@@ -219,9 +175,9 @@
   .modal{
     background:#fff;border-radius:24px;padding:32px;max-width:480px;width:100%;
     text-align:center;box-shadow:0 30px 60px -20px rgba(0,0,0,.5);
-    animation:pop .4s cubic-bezier(.34,1.56,.64,1);
+    animation:modalPop .4s cubic-bezier(.34,1.56,.64,1);
   }
-  @keyframes pop{from{transform:scale(.9)}to{transform:scale(1)}}
+  @keyframes modalPop{from{transform:scale(.9)}to{transform:scale(1)}}
   .modal h2{font-size:26px;margin-bottom:10px}
   .modal .modal-emoji{font-size:64px;line-height:1;margin-bottom:12px}
   .modal p{color:var(--muted);font-size:15px;margin-bottom:18px;line-height:1.55}
@@ -257,8 +213,7 @@
     .grid{grid-template-columns:repeat(3,1fr);gap:8px}
     .plate .emoji{font-size:32px}
     .plate .label{font-size:8.5px}
-    .ticker-item{font-size:16px;padding:0 24px}
-    .focus-window .fw-word{font-size:18px}
+    .word-display{font-size:24px}
     .top h1{font-size:15px}
     .stat{font-size:11px;padding:5px 10px}
   }
@@ -268,7 +223,7 @@
 
 <div class="wrap">
 
-  <!-- TOP BAR (visible during game) -->
+  <!-- TOP BAR -->
   <div class="top" id="topBar" style="display:none">
     <h1><span>🍽️</span> Food Vocabulary B2</h1>
     <div class="stats">
@@ -282,12 +237,12 @@
   <div class="start-card" id="startScreen">
     <div class="big-emoji">🥑</div>
     <h2>Speed Tap: Food Vocabulary</h2>
-    <p>На столе разложены продукты. Внизу по экрану бегут английские слова уровня B2. В центре бегущей строки — <b>окно фокуса</b>. Когда нужное слово оказывается в окне, успей кликнуть по продукту на столе!</p>
+    <p>На столе разложены продукты. В центре экрана по очереди появляются английские слова уровня B2. На каждое слово даётся <b>10 секунд</b>. Успей кликнуть по правильному продукту, пока не вышло время!</p>
     <div class="rules">
       <b>Правила:</b><br>
-      ✅ Клик по правильному продукту в момент, когда слово в окне — <b>+1 очко</b>.<br>
-      ❌ Ошибка или промах — <b>−1 жизнь</b> (всего 3).<br>
-      🎯 Можно кликать по продукту заранее, но очко засчитывается только если слово в фокусе.
+      ✅ Клик по правильному продукту — <b>+1 очко</b>.<br>
+      ❌ Ошибка или истечение 10 секунд — <b>−1 жизнь</b> (всего 3).<br>
+      ⏱ Полоска под словом показывает оставшееся время.
     </div>
     <div class="word-list">
       <span>avocado</span><span>beetroot</span><span>blueberry</span><span>broccoli</span>
@@ -303,12 +258,12 @@
     <div class="grid" id="grid"></div>
   </div>
 
+  <!-- WORD DISPLAY -->
   <div class="ticker-wrap hidden" id="tickerWrap">
     <div class="ticker">
-      <div class="ticker-track" id="tickerTrack"></div>
-      <div class="focus-window" id="focusWindow">
-        <div class="fw-label">Word in focus</div>
-        <div class="fw-word" id="fwWord">—</div>
+      <div class="word-display" id="wordDisplay">—</div>
+      <div class="time-bar-track">
+        <div class="time-bar-fill" id="timeBar"></div>
       </div>
     </div>
   </div>
@@ -345,7 +300,12 @@ const FOODS = [
 ];
 
 /* =========================================================
-   СОСТОЯНИЕ ИГРЫ
+   НАСТРОЙКИ ИГРЫ
+   ========================================================= */
+const WORD_TIME_MS = 10000; // 10 секунд на слово
+
+/* =========================================================
+   СОСТОЯНИЕ
    ========================================================= */
 const game = {
   active: false,
@@ -353,14 +313,11 @@ const game = {
   score: 0,
   misses: 0,
   lives: 3,
-  currentWord: null,
+  currentWordId: null,
+  currentWordObj: null,
   wordStartTime: 0,
-  tickerWordOrder: [],
-  tickerCycleStart: 0,
-  tickerElement: null,
   rafId: null,
-  lastWord: null,
-  cycleDuration: 26000, // мс на полный круг (12 слов)
+  shuffleQueue: [],
   handledThisWord: false
 };
 
@@ -381,21 +338,24 @@ function startGame(){
   game.score = 0;
   game.misses = 0;
   game.lives = 3;
-  game.lastWord = null;
-  updateStats();
+  game.shuffleQueue = [];
+  game.handledThisWord = false;
 
+  updateStats();
   buildGrid();
-  buildTicker();
-  requestAnimationFrame(tickerLoop);
+  nextWord();
+  game.rafId = requestAnimationFrame(gameLoop);
 }
 
 /* =========================================================
-   СТОЛ С ПРОДУКТАМИ
+   СТОЛ
    ========================================================= */
 function buildGrid(){
   const grid = $('grid');
   grid.innerHTML = '';
-  FOODS.forEach(f => {
+  // Перемешиваем продукты на столе каждый раз
+  const shuffled = [...FOODS].sort(() => Math.random() - 0.5);
+  shuffled.forEach(f => {
     const plate = document.createElement('div');
     plate.className = 'plate';
     plate.dataset.id = f.id;
@@ -409,122 +369,114 @@ function buildGrid(){
 }
 
 /* =========================================================
-   БЕГУЩАЯ СТРОКА
+   СЛЕДУЮЩЕЕ СЛОВО
    ========================================================= */
-function buildTicker(){
-  const track = $('tickerTrack');
-  // Создаём последовательность: 12 слов × 2 (для бесшовного цикла) + перемешиваем
-  const shuffled = [...FOODS].sort(() => Math.random() - 0.5);
-  game.tickerWordOrder = shuffled.map(f => f.id);
-  // Дублируем для плавного скролла
-  const seq = [...shuffled, ...shuffled];
-  track.innerHTML = seq.map(f => `<div class="ticker-item" data-id="${f.id}">${f.word}</div>`).join('');
-  // Стартуем анимацию заново
-  track.style.animation = 'none';
-  track.offsetHeight; // reflow
-  track.style.animation = 'scroll ' + (game.cycleDuration * 2 / 1000) + 's linear infinite';
-  game.tickerCycleStart = performance.now();
+function nextWord(){
+  // Если очередь пуста — перемешиваем заново
+  if(game.shuffleQueue.length === 0){
+    game.shuffleQueue = [...FOODS].sort(() => Math.random() - 0.5);
+  }
+  const next = game.shuffleQueue.pop();
+  
+  game.currentWordId = next.id;
+  game.currentWordObj = next;
+  game.wordStartTime = performance.now();
+  game.handledThisWord = false;
+
+  const display = $('wordDisplay');
+  display.textContent = next.word;
+  display.classList.remove('ok', 'err');
+
+  const bar = $('timeBar');
+  bar.style.width = '100%';
+  bar.classList.remove('danger');
 }
 
 /* =========================================================
-   ГЛАВНЫЙ ЦИКЛ — определяет, какое слово в фокусе
+   ИГРОВОЙ ЦИКЛ (таймер и полоска)
    ========================================================= */
-function tickerLoop(now){
-  if(!game.active){ return; }
-  if(!game.paused){
-    const track = $('tickerTrack');
-    const fw = $('focusWindow');
-    const fwWord = $('fwWord');
-    const focusRect = fw.getBoundingClientRect();
-    const centerX = focusRect.left + focusRect.width / 2;
-    const centerY = focusRect.top + focusRect.height / 2;
+function gameLoop(now){
+  if(!game.active) return;
 
-    // Находим элемент, который ближе всего к центру окна
-    let closest = null;
-    let closestDist = Infinity;
-    track.querySelectorAll('.ticker-item').forEach(item => {
-      const r = item.getBoundingClientRect();
-      const itemCenter = r.left + r.width / 2;
-      const dist = Math.abs(itemCenter - centerX);
-      // Проверяем, что элемент реально в области окна (по вертикали)
-      if(r.top <= centerY && r.bottom >= centerY && dist < closestDist){
-        closestDist = dist;
-        closest = item;
-      }
-    });
+  if(!game.paused && game.currentWordId){
+    const elapsed = now - game.wordStartTime;
+    const remaining = Math.max(0, WORD_TIME_MS - elapsed);
+    const pct = (remaining / WORD_TIME_MS) * 100;
+    
+    const bar = $('timeBar');
+    bar.style.width = pct + '%';
+    
+    if(remaining <= 3000){
+      bar.classList.add('danger');
+    }
 
-    // Если ближайший элемент находится в пределах окна фокуса
-    if(closest && closestDist < focusRect.width / 2 + 20){
-      const id = closest.dataset.id;
-      if(id !== game.currentWord){
-        // Новое слово вошло в фокус
-        game.currentWord = id;
-        game.handledThisWord = false;
-        fwWord.textContent = closest.textContent;
-        fw.classList.remove('ok','err');
-      }
-    } else if(game.currentWord){
-      // Слово вышло из фокуса без клика
-      if(!game.handledThisWord){
-        onMiss('Слово ушло из фокуса: ' + game.currentWord);
-      }
-      game.currentWord = null;
-      fwWord.textContent = '—';
+    // Если время вышло, а клика не было
+    if(remaining <= 0 && !game.handledThisWord){
+      handleTimeout();
     }
   }
-  game.rafId = requestAnimationFrame(tickerLoop);
+  game.rafId = requestAnimationFrame(gameLoop);
 }
 
 /* =========================================================
    КЛИК ПО ПРОДУКТУ
    ========================================================= */
 function onPlateClick(id, plate){
-  if(!game.active || game.paused) return;
-  if(!game.currentWord) return;
-  if(game.handledThisWord) return;
+  if(!game.active || game.paused || game.handledThisWord) return;
 
-  const isCorrect = (id === game.currentWord);
-  const fw = $('focusWindow');
+  const isCorrect = (id === game.currentWordId);
+  const display = $('wordDisplay');
 
   if(isCorrect){
     game.score++;
     game.handledThisWord = true;
     plate.classList.add('correct');
-    fw.classList.add('ok');
+    display.classList.add('ok');
+    updateStats();
+    
+    // Небольшая задержка перед следующим словом
     setTimeout(() => {
       plate.classList.remove('correct');
-      fw.classList.remove('ok');
-    }, 500);
-    updateStats();
-    // Продолжаем бег — слово считается обработанным, новое слово активируется автоматически
+      if(game.active) nextWord();
+    }, 400);
   } else {
-    game.handledThisWord = true;
     game.misses++;
     game.lives--;
+    game.handledThisWord = true;
     plate.classList.add('wrong');
-    fw.classList.add('err');
+    display.classList.add('err');
+    updateStats();
+    
     setTimeout(() => {
       plate.classList.remove('wrong');
-      fw.classList.remove('err');
+      if(game.lives <= 0){
+        endGame();
+      } else if(game.active) {
+        nextWord();
+      }
     }, 500);
-    updateStats();
-    if(game.lives <= 0){
-      setTimeout(() => endGame('lives'), 600);
-    }
   }
 }
 
 /* =========================================================
-   ПРОМАХ (слово ушло без клика)
+   ТАЙМАУТ (10 секунд истекли)
    ========================================================= */
-function onMiss(reason){
-  if(!game.active || game.paused) return;
+function handleTimeout(){
   game.misses++;
   game.lives--;
+  game.handledThisWord = true;
+  
+  const display = $('wordDisplay');
+  display.classList.add('err');
   updateStats();
-  if(game.lives <= 0){
-    endGame('lives');
-  }
+
+  setTimeout(() => {
+    if(game.lives <= 0){
+      endGame();
+    } else if(game.active) {
+      nextWord();
+    }
+  }, 500);
 }
 
 /* =========================================================
@@ -544,13 +496,17 @@ function togglePause(){
   if(!game.active) return;
   game.paused = !game.paused;
   const btn = $('pauseBtn');
-  const track = $('tickerTrack');
   if(game.paused){
     btn.textContent = '▶ Продолжить';
-    track.style.animationPlayState = 'paused';
+    // Замораживаем таймер, запоминая, сколько прошло
+    game.pausedAt = performance.now();
   } else {
     btn.textContent = '⏸ Пауза';
-    track.style.animationPlayState = 'running';
+    // Сдвигаем время старта, чтобы компенсировать паузу
+    if(game.pausedAt){
+      game.wordStartTime += (performance.now() - game.pausedAt);
+      game.pausedAt = null;
+    }
   }
 }
 
@@ -566,12 +522,13 @@ function resetGame(){
   $('gameArea').classList.add('hidden');
   $('tickerWrap').classList.add('hidden');
   $('controls').classList.add('hidden');
+  $('pauseBtn').textContent = '⏸ Пауза';
 }
 
 /* =========================================================
    КОНЕЦ ИГРЫ
    ========================================================= */
-function endGame(reason){
+function endGame(){
   game.active = false;
   if(game.rafId) cancelAnimationFrame(game.rafId);
 
@@ -610,13 +567,6 @@ function endGame(reason){
   `;
   $('modalOverlay').classList.add('show');
 }
-
-/* =========================================================
-   ЗАПУСК
-   ========================================================= */
-window.addEventListener('load', () => {
-  // Ничего не запускаем автоматически — ждём кнопку
-});
 </script>
 </body>
 </html>
