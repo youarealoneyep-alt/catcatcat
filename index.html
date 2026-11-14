@@ -777,4 +777,12 @@ function endGame(){
     <div class="modal-stats">
       <div class="modal-stat"><div class="num">${game.score}</div><div class="lbl">Правильно</div></div>
       <div class="modal-stat"><div class="num">${game.misses}</div><div class="lbl">Промахов</div></div>
-      <div class="modal-stat"><div class="num">${accuracy}%
+      <div class="modal-stat"><div class="num">${accuracy}%</div><div class="lbl">Точность</div></div>
+    </div>
+    <button class="btn" onclick="resetGame()">🔄 Играть снова</button>
+  `;
+  $('modalOverlay').classList.add('show');
+}
+</script>
+</body>
+</html>
