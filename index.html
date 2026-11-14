@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Food Vocabulary B2 — Speak & Match</title>
+<title>Food Vocabulary B2 — Voice/Click Game</title>
 <style>
   :root{
     --ink:#1e293b; --muted:#64748b; --line:#e2e8f0;
@@ -71,6 +71,7 @@
     background:#fff;
     border-radius:16px;
     display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
     border:3px solid transparent;
     box-shadow:0 4px 12px -4px rgba(0,0,0,.15);
     position:relative;
@@ -83,14 +84,17 @@
     content:"";position:absolute;inset:6px;border-radius:12px;
     border:2px dashed #f1f5f9;pointer-events:none;
   }
+  .plate:hover:not(.disabled){transform:translateY(-3px) scale(1.03);border-color:#fbbf24;box-shadow:0 10px 20px -8px rgba(251,191,36,.7)}
+
+  /* ТОЛЬКО ЭМОДЗИ, БЕЗ ПОДПИСЕЙ */
   .plate .emoji{
-    font-size:clamp(44px, 9vw, 80px);
+    font-size:clamp(50px, 10vw, 90px);
     line-height:1;
     filter:drop-shadow(0 3px 5px rgba(0,0,0,.18));
     transition:transform .2s;
   }
+  .plate:hover .emoji{transform:scale(1.08)}
 
-  /* Подсветка целевого продукта (когда нужно его назвать) */
   .plate.target{
     border-color:#fbbf24;
     background:#fffbeb;
@@ -107,7 +111,7 @@
     animation:pop .35s ease;
   }
   .plate.correct::after{
-    content:"✓";position:absolute;top:6px;right:8px;font-size:18px;
+    content:"✓";position:absolute;top:6px;right:8px;font-size:20px;
     color:var(--green);font-weight:900;
   }
   .plate.wrong{
@@ -115,9 +119,10 @@
     animation:shake .4s ease;
   }
   .plate.wrong::after{
-    content:"✕";position:absolute;top:6px;right:8px;font-size:18px;
+    content:"✕";position:absolute;top:6px;right:8px;font-size:20px;
     color:var(--red);font-weight:900;
   }
+  .plate.disabled{cursor:default;opacity:.55}
   @keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.08)}100%{transform:scale(1)}}
   @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
 
@@ -275,17 +280,16 @@
   <div class="start-card" id="startScreen">
     <div class="big-emoji">🎤</div>
     <h2>Speak & Match: Food Vocabulary</h2>
-    <p>На столе разложены продукты. В центре экрана появляется английское слово. Твоя задача — <b>произнести его вслух</b> и нажать на микрофон. На каждое слово даётся <b>10 секунд</b>.</p>
+    <p>На столе разложены продукты <b>без подписей</b>. В центре появляется английское слово — назови его вслух и нажми на микрофон (или просто кликни по продукту). На каждое слово даётся <b>10 секунд</b>.</p>
     <div class="rules">
-      <b>Правила:</b><br>
-      🎤 Нажми на микрофон и чётко произнеси слово.<br>
-      ✅ Правильное произношение — <b>+1 очко</b>.<br>
-      ❌ Ошибка, нераспознанная речь или истечение 10 секунд — <b>−1 жизнь</b> (всего 3).<br>
-      ⏱ Полоска под словом показывает оставшееся время.<br>
-      🔔 Разреши доступ к микрофону в браузере.
+      <b>Как играть:</b><br>
+      🎤 Нажми на микрофон и произнеси слово — браузер распознает.<br>
+      🖱️ Если микрофон не работает — просто кликни по нужному продукту.<br>
+      ✅ Правильно — <b>+1 очко</b>.<br>
+      ❌ Ошибка или время вышло — <b>−1 жизнь</b> (всего 3).
     </div>
     <div class="warn" id="browserWarn">
-      ⚠️ Ваш браузер не поддерживает распознавание речи. Рекомендуется открыть игру в <b>Google Chrome</b> или <b>Microsoft Edge</b>.
+      ⚠️ Микрофон недоступен (браузер или формат файла). Игра будет работать <b>в режиме клика</b>.
     </div>
     <button class="btn" style="font-size:17px;padding:14px 40px" onclick="startGame()">Начать игру 🚀</button>
   </div>
@@ -306,7 +310,7 @@
     </div>
   </div>
 
-  <!-- MIC AREA -->
+  <!-- MIC AREA (скрывается, если микрофон недоступен) -->
   <div class="mic-area hidden" id="micArea">
     <div class="heard-text" id="heardText"></div>
     <button class="mic-btn" id="micBtn" onclick="startListening()">🎤</button>
@@ -344,7 +348,7 @@ const FOODS = [
   { id:'walnuts',    emoji:'🌰' }
 ];
 
-const WORD_TIME_MS = 10000; // 10 секунд на слово
+const WORD_TIME_MS = 10000;
 
 /* =========================================================
    СОСТОЯНИЕ
@@ -363,16 +367,26 @@ const game = {
   handledThisWord: false,
   listening: false,
   recognition: null,
-  targetPlate: null
+  targetPlate: null,
+  micSupported: false
 };
 
 const $ = id => document.getElementById(id);
 
 /* =========================================================
-   ПРОВЕРКА ПОДДЕРЖКИ БРАУЗЕРА
+   ПРОВЕРКА ВОЗМОЖНОСТЕЙ БРАУЗЕРА
    ========================================================= */
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-if (!SpeechRecognition) {
+
+// Проверка протокола: микрофон работает только на HTTPS или localhost
+const isSecure = (location.protocol === 'https:' || 
+                  location.hostname === 'localhost' || 
+                  location.hostname === '127.0.0.1');
+
+game.micSupported = !!(SpeechRecognition && isSecure);
+
+if (!game.micSupported) {
+  // Показываем предупреждение на стартовом экране
   document.getElementById('browserWarn').style.display = 'block';
 }
 
@@ -380,17 +394,19 @@ if (!SpeechRecognition) {
    СТАРТ
    ========================================================= */
 function startGame(){
-  if (!SpeechRecognition) {
-    alert("Ваш браузер не поддерживает распознавание речи. Откройте в Chrome или Edge.");
-    return;
-  }
-
   $('startScreen').style.display = 'none';
   $('topBar').style.display = 'flex';
   $('gameArea').classList.remove('hidden');
   $('tickerWrap').classList.remove('hidden');
-  $('micArea').classList.remove('hidden');
   $('controls').classList.remove('hidden');
+
+  // Показываем микрофон ТОЛЬКО если он поддерживается
+  if (game.micSupported) {
+    $('micArea').classList.remove('hidden');
+    initRecognition();
+  } else {
+    $('micArea').classList.add('hidden');
+  }
 
   game.active = true;
   game.paused = false;
@@ -403,13 +419,12 @@ function startGame(){
 
   updateStats();
   buildGrid();
-  initRecognition();
   nextWord();
   game.rafId = requestAnimationFrame(gameLoop);
 }
 
 /* =========================================================
-   СТОЛ (только картинки, без подписей)
+   СТОЛ — ТОЛЬКО КАРТИНКИ, БЕЗ ПОДПИСЕЙ
    ========================================================= */
 function buildGrid(){
   const grid = $('grid');
@@ -419,42 +434,40 @@ function buildGrid(){
     const plate = document.createElement('div');
     plate.className = 'plate';
     plate.dataset.id = f.id;
+    // ВАЖНО: только эмодзи, никаких label
     plate.innerHTML = `<div class="emoji">${f.emoji}</div>`;
+    // Добавляем клик для режима без микрофона
+    plate.addEventListener('click', () => onPlateClick(f.id));
     grid.appendChild(plate);
   });
 }
 
 /* =========================================================
-   ИНИЦИАЛИЗАЦИЯ РАСПОЗНАВАНИЯ РЕЧИ
+   РАСПОЗНАВАНИЕ РЕЧИ
    ========================================================= */
 function initRecognition(){
   game.recognition = new SpeechRecognition();
   game.recognition.lang = 'en-US';
   game.recognition.interimResults = false;
-  game.recognition.maxAlternatives = 5; // несколько вариантов для сравнения
+  game.recognition.maxAlternatives = 5;
   game.recognition.continuous = false;
 
   game.recognition.onresult = (event) => {
     const results = event.results[0];
     const alternatives = [];
     for (let i = 0; i < results.length; i++) {
-      alternatives.push(results[i].transcript.trim().toLowerCase());
+      alternatives.push(results[i].transcript.trim().toLowerCase().replace(/[.,!?]/g, ''));
     }
     
     const heard = alternatives[0];
     $('heardText').textContent = 'Услышано: "' + heard + '"';
     
-    // Проверяем, совпадает ли хотя бы один вариант с целевым словом
     const target = game.currentWordId.toLowerCase();
-    const isCorrect = alternatives.some(alt => {
-      // Убираем знаки препинания и лишние пробелы
-      const clean = alt.replace(/[.,!?]/g, '').trim();
-      return clean === target || 
-             clean.includes(target) || 
-             target.includes(clean) && clean.length > 3;
-    });
+    const isCorrect = alternatives.some(alt => 
+      alt === target || alt.includes(target) || (alt.length > 3 && target.includes(alt))
+    );
     
-    handleSpokenAnswer(isCorrect, heard);
+    handleAnswer(isCorrect, heard);
   };
 
   game.recognition.onerror = (event) => {
@@ -463,15 +476,13 @@ function initRecognition(){
     $('micBtn').disabled = false;
     
     if (event.error === 'no-speech') {
-      $('micHint').textContent = 'Речь не распознана. Попробуй ещё раз.';
-      $('micHint').className = 'mic-hint err';
+      $('micHint').textContent = 'Речь не распознана. Попробуй ещё раз или кликни по продукту.';
     } else if (event.error === 'not-allowed') {
-      $('micHint').textContent = 'Доступ к микрофону запрещён. Разреши в настройках браузера.';
-      $('micHint').className = 'mic-hint err';
+      $('micHint').textContent = 'Доступ к микрофону запрещён. Кликай по продукту.';
     } else {
-      $('micHint').textContent = 'Ошибка: ' + event.error + '. Попробуй ещё раз.';
-      $('micHint').className = 'mic-hint err';
+      $('micHint').textContent = 'Ошибка микрофона. Кликни по продукту.';
     }
+    $('micHint').className = 'mic-hint err';
   };
 
   game.recognition.onend = () => {
@@ -494,8 +505,11 @@ function nextWord(){
   game.wordStartTime = performance.now();
   game.handledThisWord = false;
 
-  // Подсвечиваем целевой продукт на столе
-  document.querySelectorAll('.plate').forEach(p => p.classList.remove('target'));
+  // Сброс подсветки
+  document.querySelectorAll('.plate').forEach(p => {
+    p.classList.remove('target', 'correct', 'wrong');
+  });
+  
   const targetPlate = document.querySelector(`.plate[data-id="${next.id}"]`);
   if(targetPlate) {
     targetPlate.classList.add('target');
@@ -511,9 +525,11 @@ function nextWord(){
   bar.classList.remove('danger');
 
   $('heardText').textContent = '';
-  $('micHint').textContent = 'Нажми на микрофон и произнеси слово';
-  $('micHint').className = 'mic-hint';
-  $('micBtn').disabled = false;
+  if (game.micSupported) {
+    $('micHint').textContent = 'Нажми на микрофон или кликни по продукту';
+    $('micHint').className = 'mic-hint';
+    $('micBtn').disabled = false;
+  }
 }
 
 /* =========================================================
@@ -542,10 +558,11 @@ function gameLoop(now){
 }
 
 /* =========================================================
-   ЗАПУСК СЛУШАНИЯ
+   МИКРОФОН
    ========================================================= */
 function startListening(){
   if(!game.active || game.paused || game.handledThisWord || game.listening) return;
+  if(!game.micSupported) return;
   
   game.listening = true;
   $('micBtn').classList.add('listening');
@@ -557,20 +574,44 @@ function startListening(){
   try {
     game.recognition.start();
   } catch(e) {
-    // Если уже запущено — игнорируем
-    console.warn('Recognition already started', e);
+    console.warn(e);
+    game.listening = false;
+    $('micBtn').classList.remove('listening');
+    $('micBtn').disabled = false;
   }
 }
 
 /* =========================================================
-   ОБРАБОТКА ГОЛОСОВОГО ОТВЕТА
+   КЛИК ПО ПРОДУКТУ (альтернатива микрофону)
    ========================================================= */
-function handleSpokenAnswer(isCorrect, heard){
+function onPlateClick(id){
+  if(!game.active || game.paused || game.handledThisWord) return;
+  
+  const isCorrect = (id === game.currentWordId);
+  const heard = isCorrect ? 'Клик по правильному продукту' : 'Клик по неправильному';
+  
+  // Останавливаем распознавание, если идёт
+  if(game.listening){
+    try { game.recognition.abort(); } catch(e){}
+    game.listening = false;
+    $('micBtn').classList.remove('listening');
+    $('micBtn').disabled = true;
+  }
+  
+  handleAnswer(isCorrect, heard);
+}
+
+/* =========================================================
+   ОБРАБОТКА ОТВЕТА (общая для голоса и клика)
+   ========================================================= */
+function handleAnswer(isCorrect, heard){
   if(game.handledThisWord) return;
   game.handledThisWord = true;
   game.listening = false;
-  $('micBtn').classList.remove('listening');
-  $('micBtn').disabled = true;
+  if($('micBtn')) {
+    $('micBtn').classList.remove('listening');
+    $('micBtn').disabled = true;
+  }
 
   const display = $('wordDisplay');
   const target = game.targetPlate;
@@ -578,32 +619,34 @@ function handleSpokenAnswer(isCorrect, heard){
   if(isCorrect){
     game.score++;
     display.classList.add('ok');
-    $('micHint').textContent = '✅ Отлично! Правильно!';
-    $('micHint').className = 'mic-hint ok';
+    if (game.micSupported) {
+      $('micHint').textContent = '✅ Отлично! Правильно!';
+      $('micHint').className = 'mic-hint ok';
+    }
     if(target) target.classList.add('correct');
     updateStats();
     
     setTimeout(() => {
-      if(target) { target.classList.remove('correct', 'target'); }
       if(game.active) nextWord();
-    }, 1200);
+    }, 1000);
   } else {
     game.misses++;
     game.lives--;
     display.classList.add('err');
-    $('micHint').textContent = '❌ Не совсем. Правильно: "' + game.currentWordId + '"';
-    $('micHint').className = 'mic-hint err';
+    if (game.micSupported) {
+      $('micHint').textContent = '❌ Не совсем. Правильно: "' + game.currentWordId + '"';
+      $('micHint').className = 'mic-hint err';
+    }
     if(target) target.classList.add('wrong');
     updateStats();
     
     setTimeout(() => {
-      if(target) { target.classList.remove('wrong', 'target'); }
       if(game.lives <= 0){
         endGame();
       } else if(game.active) {
         nextWord();
       }
-    }, 1500);
+    }, 1400);
   }
 }
 
@@ -618,25 +661,28 @@ function handleTimeout(){
   if(game.listening){
     try { game.recognition.abort(); } catch(e){}
     game.listening = false;
-    $('micBtn').classList.remove('listening');
-    $('micBtn').disabled = true;
+    if($('micBtn')) {
+      $('micBtn').classList.remove('listening');
+      $('micBtn').disabled = true;
+    }
   }
   
   const display = $('wordDisplay');
   display.classList.add('err');
-  $('micHint').textContent = '⏰ Время вышло! Слово: "' + game.currentWordId + '"';
-  $('micHint').className = 'mic-hint err';
+  if (game.micSupported) {
+    $('micHint').textContent = '⏰ Время вышло! Слово: "' + game.currentWordId + '"';
+    $('micHint').className = 'mic-hint err';
+  }
   if(game.targetPlate) game.targetPlate.classList.add('wrong');
   updateStats();
 
   setTimeout(() => {
-    if(game.targetPlate) { game.targetPlate.classList.remove('wrong', 'target'); }
     if(game.lives <= 0){
       endGame();
     } else if(game.active) {
       nextWord();
     }
-  }, 1500);
+  }, 1400);
 }
 
 /* =========================================================
@@ -662,8 +708,10 @@ function togglePause(){
     if(game.listening){
       try { game.recognition.abort(); } catch(e){}
       game.listening = false;
-      $('micBtn').classList.remove('listening');
-      $('micBtn').disabled = false;
+      if($('micBtn')) {
+        $('micBtn').classList.remove('listening');
+        $('micBtn').disabled = false;
+      }
     }
   } else {
     btn.textContent = '⏸ Пауза';
@@ -715,7 +763,7 @@ function endGame(){
     desc = 'Хороший старт! Ещё немного практики — и будет идеально.';
   } else if(game.score >= 3){
     emoji = '🥉'; title = 'Kitchen Beginner';
-    desc = 'Неплохо для начала. Попробуй ещё раз, чтобы запомнить больше слов.';
+    desc = 'Неплохо для начала. Попробуй ещё раз.';
   } else {
     emoji = '🍳'; title = 'Just Starting';
     desc = 'Все с чего-то начинают! Повтори слова и попробуй снова.';
@@ -729,12 +777,4 @@ function endGame(){
     <div class="modal-stats">
       <div class="modal-stat"><div class="num">${game.score}</div><div class="lbl">Правильно</div></div>
       <div class="modal-stat"><div class="num">${game.misses}</div><div class="lbl">Промахов</div></div>
-      <div class="modal-stat"><div class="num">${accuracy}%</div><div class="lbl">Точность</div></div>
-    </div>
-    <button class="btn" onclick="resetGame()">🔄 Играть снова</button>
-  `;
-  $('modalOverlay').classList.add('show');
-}
-</script>
-</body>
-</html>
+      <div class="modal-stat"><div class="num">${accuracy}%
