@@ -1,615 +1,614 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ротация станций: Принципы обучения ИЯ</title>
-<style>
-  :root {
-    --primary: #2563eb;
-    --primary-dark: #1e40af;
-    --secondary: #f59e0b;
-    --success: #10b981;
-    --danger: #ef4444;
-    --bg: #f8fafc;
-    --text: #1e293b;
-    --text-light: #64748b;
-    --border: #e2e8f0;
-    --card: #ffffff;
-    --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-  }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐱 Warm Breeze · Cat Vocab Lab</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body {
+            background: radial-gradient(circle at 20% 30%, #3d3530, #1f1a17);
+            min-height: 100vh;
+            padding: 1.8rem 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #f0e6d8;
+            position: relative;
+            overflow-x: hidden;
+        }
 
-  body {
-    background: linear-gradient(135deg, #eff6ff 0%, #f8fafc 100%);
-    color: var(--text);
-    min-height: 100vh;
-    padding: 20px;
-    line-height: 1.6;
-  }
+        body::before {
+            content: "🐈";
+            position: absolute;
+            top: 4%;
+            left: 3%;
+            font-size: 6rem;
+            opacity: 0.12;
+            transform: rotate(-15deg);
+            pointer-events: none;
+        }
 
-  .container { max-width: 900px; margin: 0 auto; }
+        body::after {
+            content: "🐾";
+            position: absolute;
+            bottom: 5%;
+            right: 4%;
+            font-size: 8rem;
+            opacity: 0.1;
+            transform: rotate(20deg);
+            pointer-events: none;
+        }
 
-  /* Шапка и таймер */
-  .header {
-    display: flex; justify-content: space-between; align-items: center;
-    background: var(--card); padding: 15px 25px; border-radius: 16px;
-    box-shadow: var(--shadow); margin-bottom: 24px; border: 1px solid var(--border);
-    position: sticky; top: 10px; z-index: 100;
-  }
-  .header h1 { font-size: 20px; color: var(--primary-dark); display: flex; align-items: center; gap: 10px; }
-  
-  .timer-box {
-    display: flex; align-items: center; gap: 10px;
-    background: #f1f5f9; padding: 10px 20px; border-radius: 12px;
-    font-size: 24px; font-weight: 800; color: var(--primary);
-    border: 2px solid var(--primary);
-  }
-  .timer-box.danger { color: var(--danger); border-color: var(--danger); background: #fef2f2; animation: pulse 1s infinite; }
-  @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.02); } }
+        .container {
+            max-width: 1400px;
+            width: 100%;
+            background: rgba(45, 40, 35, 0.88);
+            backdrop-filter: blur(12px);
+            border-radius: 3rem;
+            padding: 2rem 1.8rem;
+            box-shadow: 0 20px 40px -15px rgba(0,0,0,0.7);
+            border: 1px solid rgba(232,168,124,0.25);
+            position: relative;
+            z-index: 10;
+        }
 
-  /* Навигация по станциям */
-  .nav-stations {
-    display: flex; gap: 10px; margin-bottom: 24px; overflow-x: auto; padding-bottom: 5px;
-  }
-  .station-tab {
-    flex: 1; min-width: 150px; text-align: center; padding: 12px;
-    background: var(--card); border: 2px solid var(--border); border-radius: 12px;
-    font-weight: 700; cursor: pointer; transition: all 0.3s ease;
-    display: flex; flex-direction: column; align-items: center; gap: 5px;
-  }
-  .station-tab.active { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
-  .station-tab.completed { background: #d1fae5; color: #047857; border-color: var(--success); }
-  .station-tab .st-icon { font-size: 24px; }
-  .station-tab .st-text { font-size: 13px; }
+        .cat-ears {
+            position: absolute;
+            top: -22px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 30px;
+            display: flex;
+            justify-content: space-between;
+            pointer-events: none;
+        }
+        .cat-ears::before, .cat-ears::after {
+            content: "";
+            width: 0; height: 0;
+            border-left: 18px solid transparent;
+            border-right: 18px solid transparent;
+            border-bottom: 25px solid #e8a87c;
+            opacity: 0.5;
+        }
+        .cat-ears::before { transform: rotate(-15deg); }
+        .cat-ears::after { transform: rotate(15deg); }
 
-  /* Контент станций */
-  .station-content {
-    background: var(--card); border-radius: 20px; padding: 30px;
-    box-shadow: var(--shadow); border: 1px solid var(--border);
-    display: none; animation: fadeIn 0.4s ease;
-  }
-  .station-content.active { display: block; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 0.8rem;
+        }
 
-  h2 { font-size: 24px; margin-bottom: 10px; color: var(--text); }
-  .subtitle { color: var(--text-light); margin-bottom: 20px; font-size: 15px; }
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 350;
+            color: #faf2e4;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+        h1 .badge {
+            background: #6b4f3a;
+            padding: 0.2rem 1rem;
+            border-radius: 60px;
+            font-size: 1rem;
+            color: #fce8d4;
+            border: 1px solid #e8a87c;
+        }
 
-  /* Введение (Инструкция) */
-  .intro-card {
-    text-align: center; padding: 40px 20px;
-  }
-  .intro-card h2 { font-size: 28px; margin-bottom: 15px; color: var(--primary-dark); }
-  .intro-card p { max-width: 600px; margin: 0 auto 20px; color: var(--text-light); }
-  .rules-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 30px 0; text-align: left; }
-  .rule-item { background: #f8fafc; padding: 15px; border-radius: 12px; border-left: 4px solid var(--primary); }
-  .rule-item strong { display: block; margin-bottom: 5px; color: var(--primary-dark); }
+        .stats-panel {
+            display: flex;
+            gap: 18px;
+            flex-wrap: wrap;
+            align-items: center;
+            background: rgba(30,25,20,0.55);
+            padding: 0.6rem 1.4rem;
+            border-radius: 80px;
+            border: 1px solid rgba(232,168,124,0.3);
+        }
+        .stat-item { display: flex; align-items: center; gap: 8px; font-size: 1rem; color: #e8d5c0; }
+        .stat-item .value {
+            font-weight: 600;
+            color: #ffd9b8;
+            background: #3d2e24;
+            padding: 0.15rem 0.8rem;
+            border-radius: 30px;
+            min-width: 45px;
+            text-align: center;
+            border: 1px solid #7a5f48;
+        }
 
-  /* Кнопки */
-  .btn {
-    background: var(--primary); color: white; border: none; padding: 12px 24px;
-    border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer;
-    transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-  }
-  .btn:hover { background: var(--primary-dark); transform: translateY(-2px); }
-  .btn:active { transform: translateY(0); }
-  .btn:disabled { background: var(--text-light); cursor: not-allowed; transform: none; opacity: 0.6; }
-  .btn.outline { background: transparent; color: var(--primary); border: 2px solid var(--primary); }
-  .btn.outline:hover { background: #eff6ff; }
+        .mode-switch {
+            display: flex;
+            gap: 8px;
+            background: #2a221d;
+            padding: 6px;
+            border-radius: 50px;
+            border: 1px solid #5a4535;
+            margin: 1.5rem 0 1rem;
+            width: fit-content;
+        }
+        .mode-btn {
+            background: transparent;
+            border: none;
+            color: #d9b99a;
+            padding: 0.6rem 1.6rem;
+            border-radius: 40px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .mode-btn.active { background: #c97b4a; color: #fff5ec; }
+        .mode-btn:hover:not(.active) { background: #4a3729; }
 
-  /* Станция 1: Работа с педагогом (Интерактив) */
-  .teacher-task { background: #f8fafc; border-radius: 16px; padding: 20px; border: 1px solid var(--border); margin-bottom: 20px; }
-  .task-label { font-size: 12px; font-weight: 800; text-transform: uppercase; color: var(--primary); margin-bottom: 10px; letter-spacing: 0.5px; }
-  .match-container { display: grid; gap: 15px; }
-  .match-row { display: flex; gap: 10px; align-items: center; }
-  .match-term { flex: 1; background: white; padding: 12px 15px; border-radius: 8px; border: 1px solid var(--border); font-weight: 600; font-size: 14px; }
-  .match-select { flex: 1; padding: 12px; border-radius: 8px; border: 2px solid var(--border); font-size: 14px; outline: none; cursor: pointer; }
-  .match-select:focus { border-color: var(--primary); }
-  .match-select.correct { border-color: var(--success); background: #f0fdf4; }
-  .match-select.wrong { border-color: var(--danger); background: #fef2f2; }
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.2rem;
+            margin: 1.8rem 0 1rem;
+        }
 
-  /* Станция 2: Мини-проект (Карточки) */
-  .project-board { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-  .project-column { background: #f8fafc; padding: 15px; border-radius: 12px; border: 2px dashed var(--border); min-height: 300px; }
-  .project-column h3 { font-size: 15px; text-align: center; margin-bottom: 15px; color: var(--primary-dark); }
-  .draggable-card {
-    background: white; padding: 12px; border-radius: 8px; margin-bottom: 10px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05); cursor: pointer; border: 1px solid var(--border);
-    transition: all 0.2s; font-size: 14px; text-align: center; font-weight: 600;
-  }
-  .draggable-card:hover { border-color: var(--primary); transform: translateY(-2px); }
-  .draggable-card.selected { border-color: var(--secondary); background: #fffbeb; transform: scale(1.02); box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2); }
+        .card {
+            background: #fdf8f0;
+            border-radius: 2rem;
+            padding: 1.3rem 1.2rem 1.4rem;
+            box-shadow: 0 10px 20px -8px rgba(0,0,0,0.5);
+            transition: all 0.25s;
+            display: flex;
+            flex-direction: column;
+            border-left: 6px solid #e8a87c;
+            cursor: pointer;
+            user-select: none;
+            color: #3d322a;
+            position: relative;
+        }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 25px 30px -12px #00000070; }
+        .card::after {
+            content: "🐾";
+            position: absolute;
+            bottom: 8px; right: 12px;
+            font-size: 0.9rem;
+            opacity: 0.15;
+            transform: rotate(15deg);
+        }
+        .card.revealed { border-left-color: #b8825a; background: #f9f4e6; }
 
-  /* Станция 3: Игра (Тест) */
-  .quiz-question { font-size: 18px; font-weight: 700; margin-bottom: 20px; }
-  .quiz-options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
-  .quiz-option {
-    padding: 15px; background: #f8fafc; border: 2px solid var(--border);
-    border-radius: 12px; cursor: pointer; transition: all 0.2s; font-size: 15px;
-  }
-  .quiz-option:hover { border-color: var(--primary); background: #eff6ff; }
-  .quiz-option.selected { border-color: var(--primary); background: #eff6ff; }
-  .quiz-option.correct { border-color: var(--success); background: #f0fdf4; }
-  .quiz-option.wrong { border-color: var(--danger); background: #fef2f2; }
+        .word {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #4a3828;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .hint {
+            font-size: 0.8rem;
+            color: #9a7f68;
+            margin-top: 0.3rem;
+            margin-bottom: 0.4rem;
+            font-style: italic;
+        }
+        .hint::before { content: "🐱 "; }
+        .card.revealed .hint::before { content: "😺 "; }
 
-  /* Финальный экран */
-  .final-screen { text-align: center; padding: 40px 20px; }
-  .final-screen h2 { color: var(--success); font-size: 32px; margin-bottom: 15px; }
-  .final-screen .stats { display: flex; justify-content: center; gap: 30px; margin: 30px 0; }
-  .stat-box { background: #f8fafc; padding: 20px 40px; border-radius: 16px; border: 1px solid var(--border); }
-  .stat-box .num { font-size: 36px; font-weight: 900; color: var(--primary); }
-  .stat-box .label { font-size: 14px; color: var(--text-light); text-transform: uppercase; letter-spacing: 1px; }
+        .answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s ease, opacity 0.3s, padding 0.2s, margin 0.2s;
+            opacity: 0;
+            font-size: 0.93rem;
+            line-height: 1.5;
+            background: #f3e8da;
+            border-radius: 1.2rem;
+            padding: 0 0.8rem;
+        }
+        .card.revealed .answer {
+            padding: 0.7rem 0.8rem;
+            margin-top: 0.6rem;
+            opacity: 1;
+            max-height: 300px;
+        }
+        .answer p {
+            background: #ece0d2;
+            padding: 0.5rem 0.8rem;
+            border-radius: 1rem;
+            color: #3d2e24;
+            border: 1px solid #d9c4b0;
+            margin-bottom: 0.4rem;
+        }
+        .example {
+            font-size: 0.85rem;
+            color: #7a604c;
+            margin-top: 0.4rem;
+            font-style: italic;
+        }
+        .example::before { content: "✧ "; color: #c9a88a; }
 
-  /* Утилиты */
-  .hidden { display: none !important; }
-  .mt-20 { margin-top: 20px; }
-  .text-center { text-align: center; }
-  .flex-between { display: flex; justify-content: space-between; align-items: center; }
+        .action-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 1.2rem;
+            border-top: 1px dashed #6b5240;
+            padding-top: 1.2rem;
+        }
 
-  @media (max-width: 600px) {
-    .project-board { grid-template-columns: 1fr; }
-    .nav-stations { flex-direction: column; }
-    .header { flex-direction: column; gap: 15px; text-align: center; }
-  }
-</style>
+        .btn {
+            background: #4d3a2c;
+            border: 1px solid #e8a87c;
+            color: #fae6d2;
+            padding: 0.6rem 1.5rem;
+            border-radius: 40px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+        .btn:hover { background: #6b4f3a; transform: scale(1.02); }
+        .btn.secondary { background: transparent; color: #d9b99a; }
+        .btn.secondary:hover { background: #4d3a2c; }
+
+        .quiz-panel {
+            background: #332a23;
+            border-radius: 2rem;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            border: 1px solid #7a5f48;
+            display: none;
+        }
+        .quiz-panel.active { display: block; }
+
+        .quiz-question {
+            font-size: 1.6rem;
+            color: #faecd8;
+            margin-bottom: 1.2rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px dashed #8a6f58;
+        }
+        .quiz-question::before { content: "❓ "; opacity: 0.8; }
+
+        .quiz-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 1.5rem 0;
+        }
+        .quiz-option {
+            background: #3f342b;
+            border: 1px solid #8a6f58;
+            color: #f0ddc8;
+            padding: 0.8rem 1.5rem;
+            border-radius: 60px;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-size: 1rem;
+            flex: 1 0 200px;
+            text-align: center;
+        }
+        .quiz-option:hover { background: #574538; border-color: #e8a87c; }
+        .quiz-option.correct { background: #3c743c; border-color: #90c27a; color: white; }
+        .quiz-option.wrong { background: #7a3e3e; border-color: #b87474; color: #ffe6e6; }
+
+        .quiz-feedback {
+            font-size: 1.1rem;
+            margin-top: 1rem;
+            color: #e8d5c0;
+            min-height: 2rem;
+        }
+        .quiz-feedback::before { content: "🐾 "; opacity: 0.7; }
+
+        .footer-note {
+            margin-top: 1.8rem;
+            text-align: center;
+            color: #c9b09a;
+            font-size: 0.8rem;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .footer-note span {
+            background: #2a221d;
+            padding: 0.3rem 1rem;
+            border-radius: 50px;
+            color: #e8c8a8;
+            border: 1px solid #5a4535;
+        }
+
+        .floating-notif {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #6b4f3a;
+            color: #fff3e6;
+            padding: 0.8rem 2rem;
+            border-radius: 60px;
+            box-shadow: 0 15px 25px -8px black;
+            border: 1px solid #e8a87c;
+            font-weight: 500;
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        .floating-notif.show { opacity: 1; }
+
+        @media (max-width: 750px) {
+            body { padding: 0.8rem; }
+            .container { padding: 1.3rem; border-radius: 2rem; }
+            h1 { font-size: 1.7rem; }
+            .mode-switch { width: 100%; overflow-x: auto; }
+            .card-grid { grid-template-columns: 1fr; }
+            .quiz-options { flex-direction: column; }
+            .cat-ears { display: none; }
+        }
+    </style>
 </head>
 <body>
+    <div class="container" id="appContainer">
+        <div class="cat-ears"></div>
 
-<div class="container">
-  <!-- Шапка -->
-  <div class="header" id="mainHeader">
-    <h1>📚 Практикум: Принципы обучения ИЯ</h1>
-    <div class="timer-box" id="timerBox">
-      <span>⏱</span> <span id="timerDisplay">90:00</span>
-    </div>
-  </div>
-
-  <!-- Экран приветствия -->
-  <div id="introScreen" class="station-content active intro-card">
-    <h2>Добро пожаловать на занятие!</h2>
-    <p>Сегодня мы проведем 90-минутный практикум в формате <strong>«Ротация станций»</strong> по теме «Принципы обучения иностранным языкам» (по материалам параграфа 2).</p>
-    
-    <div class="rules-grid">
-      <div class="rule-item">
-        <strong>Станция 1: Педагог</strong>
-        Интерактивный разбор принципов (личностно-ориентированный, сознательности, творческий, деятельности).
-      </div>
-      <div class="rule-item">
-        <strong>Станция 2: Мини-проект</strong>
-        Группировка методов и приемов по категориям на основе текста.
-      </div>
-      <div class="rule-item">
-        <strong>Станция 3: Игра</strong>
-        Проверка понимания материала через интерактивный квиз.
-      </div>
-    </div>
-
-    <p style="font-size: 14px; color: var(--text-light); margin-bottom: 20px;">
-      * На каждую станцию отводится примерно 25-30 минут. Переход осуществляется автоматически или по кнопке. Время пошло!
-    </p>
-
-    <button class="btn" onclick="startLesson()">Начать занятие 🚀</button>
-  </div>
-
-  <!-- Навигация по станциям (скрыта до старта) -->
-  <div class="nav-stations hidden" id="stationNav">
-    <div class="station-tab active" id="tab-0" onclick="switchStation(0)">
-      <span class="st-icon">👩‍🏫</span>
-      <span class="st-text">Станция 1: С педагогом</span>
-    </div>
-    <div class="station-tab" id="tab-1" onclick="switchStation(1)">
-      <span class="st-icon">🛠️</span>
-      <span class="st-text">Станция 2: Мини-проект</span>
-    </div>
-    <div class="station-tab" id="tab-2" onclick="switchStation(2)">
-      <span class="st-icon">🎮</span>
-      <span class="st-text">Станция 3: Игра</span>
-    </div>
-  </div>
-
-  <!-- СТАНЦИЯ 1: С ПЕДАГОГОМ -->
-  <div id="station0" class="station-content">
-    <h2>👩‍🏫 Станция 1: Работа с педагогом</h2>
-    <p class="subtitle">Интерактивное задание: соотнесите название принципа обучения с его сущностью, опираясь на текст.</p>
-
-    <div class="teacher-task">
-      <div class="task-label">Задание: Соедините принцип и его характеристику</div>
-      <div class="match-container">
-        <!-- Вопрос 1 -->
-        <div class="match-row">
-          <div class="match-term">1. Принцип личностно-ориентированной направленности</div>
-          <select class="match-select" data-answer="b">
-            <option value="">Выберите характеристику...</option>
-            <option value="a">Обучающийся не просто овладевает системой языка, а формирует картину мира.</option>
-            <option value="b">Ученик является субъектом учебно-воспитательного процесса, учитываются его интересы и способности.</option>
-            <option value="c">Овладение ИЯ должно строиться как творческий процесс, а не механическая выработка навыков.</option>
-            <option value="d">Обучающийся должен проявлять активность и самостоятельность в процессе обучения.</option>
-          </select>
+        <div class="header-top">
+            <h1>
+                🐱 Warm Breeze · Cat Vocab Lab
+                <span class="badge">32 expressions</span>
+            </h1>
+            <div class="stats-panel">
+                <div class="stat-item">📚 <span class="value" id="learnedCount">0</span> learned</div>
+                <div class="stat-item">🎯 <span class="value" id="quizScore">0</span> correct</div>
+                <div class="stat-item">📈 <span class="value" id="streakCount">0</span> streak</div>
+            </div>
         </div>
-        <!-- Вопрос 2 -->
-        <div class="match-row">
-          <div class="match-term">2. Принцип сознательности</div>
-          <select class="match-select" data-answer="a">
-            <option value="">Выберите характеристику...</option>
-            <option value="a">Обучающийся не просто овладевает системой языка, а формирует картину мира.</option>
-            <option value="b">Ученик является субъектом учебно-воспитательного процесса, учитываются его интересы и способности.</option>
-            <option value="c">Овладение ИЯ должно строиться как творческий процесс, а не механическая выработка навыков.</option>
-            <option value="d">Обучающийся должен проявлять активность и самостоятельность в процессе обучения.</option>
-          </select>
+
+        <div class="mode-switch">
+            <button class="mode-btn active" data-mode="explore">🐾 Explore & Learn</button>
+            <button class="mode-btn" data-mode="quiz">🎮 Quiz Challenge</button>
         </div>
-        <!-- Вопрос 3 -->
-        <div class="match-row">
-          <div class="match-term">3. Принцип творческого характера обучения</div>
-          <select class="match-select" data-answer="c">
-            <option value="">Выберите характеристику...</option>
-            <option value="a">Обучающийся не просто овладевает системой языка, а формирует картину мира.</option>
-            <option value="b">Ученик является субъектом учебно-воспитательного процесса, учитываются его интересы и способности.</option>
-            <option value="c">Овладение ИЯ должно строиться как творческий процесс, а не механическая выработка навыков.</option>
-            <option value="d">Обучающийся должен проявлять активность и самостоятельность в процессе обучения.</option>
-          </select>
+
+        <div id="exploreView">
+            <div class="card-grid" id="cardGrid"></div>
+            <div class="action-bar">
+                <button class="btn" id="revealAllBtn">🔓 Reveal all cards</button>
+                <button class="btn secondary" id="resetAllBtn">🔄 Reset all progress</button>
+            </div>
         </div>
-        <!-- Вопрос 4 -->
-        <div class="match-row">
-          <div class="match-term">4. Принцип активности</div>
-          <select class="match-select" data-answer="d">
-            <option value="">Выберите характеристику...</option>
-            <option value="a">Обучающийся не просто овладевает системой языка, а формирует картину мира.</option>
-            <option value="b">Ученик является субъектом учебно-воспитательного процесса, учитываются его интересы и способности.</option>
-            <option value="c">Овладение ИЯ должно строиться как творческий процесс, а не механическая выработка навыков.</option>
-            <option value="d">Обучающийся должен проявлять активность и самостоятельность в процессе обучения.</option>
-          </select>
+
+        <div id="quizView" class="quiz-panel">
+            <div class="quiz-question" id="quizQuestion">Loading question...</div>
+            <div class="quiz-options" id="quizOptions"></div>
+            <div class="quiz-feedback" id="quizFeedback"></div>
+            <div style="display:flex; gap:12px; margin-top:1rem; flex-wrap:wrap;">
+                <button class="btn" id="nextQuestionBtn">⏩ Next question</button>
+                <button class="btn secondary" id="resetQuizBtn">🔄 Reset quiz</button>
+            </div>
         </div>
-      </div>
-    </div>
 
-    <div class="flex-between mt-20">
-      <button class="btn outline" onclick="checkTeacherStation()">Проверить ответы</button>
-      <button class="btn hidden" id="btnNextFromTeacher" onclick="switchStation(1)">Перейти к станции 2 ➔</button>
-    </div>
-  </div>
-
-  <!-- СТАНЦИЯ 2: МИНИ-ПРОЕКТ -->
-  <div id="station1" class="station-content">
-    <h2>🛠️ Станция 2: Мини-проект</h2>
-    <p class="subtitle">Распределите утверждения из текста по двум колонкам: к какому принципу они относятся?</p>
-
-    <div class="project-board">
-      <!-- Колонка 1 -->
-      <div class="project-column" id="col-method" onclick="dropCard('method')">
-        <h3>Методические принципы<br><small>(коммуникативная направленность)</small></h3>
-        <div class="cards-container" id="col-method-cards"></div>
-      </div>
-      <!-- Колонка 2 -->
-      <div class="project-column" id="col-general" onclick="dropCard('general')">
-        <h3>Общедидактические принципы<br><small>(личностная ориентация, сознательность)</small></h3>
-        <div class="cards-container" id="col-general-cards"></div>
-      </div>
-    </div>
-    
-    <!-- Пул карточек -->
-    <div style="margin-top: 20px; padding: 15px; background: #f1f5f9; border-radius: 12px;">
-      <p style="font-size: 13px; font-weight: 700; margin-bottom: 10px; color: var(--text-light);">Доступные карточки (кликните, чтобы выбрать, затем кликните по колонке):</p>
-      <div id="cards-pool" style="display: flex; flex-wrap: wrap; gap: 10px;">
-        <div class="draggable-card" data-type="method" onclick="selectCard(this)">Обучение ИЯ как средство межкультурной коммуникации</div>
-        <div class="draggable-card" data-type="general" onclick="selectCard(this)">Учет индивидуально-психологических особенностей (С.Л. Рубинштейн)</div>
-        <div class="draggable-card" data-type="method" onclick="selectCard(this)">Овладение языком как средством общения и познания мира</div>
-        <div class="draggable-card" data-type="general" onclick="selectCard(this)">Развитие самостоятельности и активности (И.Я. Лернер)</div>
-        <div class="draggable-card" data-type="method" onclick="selectCard(this)">Обучение должно быть направлено на практическое овладение речью</div>
-        <div class="draggable-card" data-type="general" onclick="selectCard(this)">Воспитание толерантности и эмпатии к другой культуре</div>
-      </div>
-    </div>
-
-    <div class="flex-between mt-20">
-      <button class="btn outline" onclick="checkProjectStation()">Проверить проект</button>
-      <button class="btn hidden" id="btnNextFromProject" onclick="switchStation(2)">Перейти к станции 3 ➔</button>
-    </div>
-  </div>
-
-  <!-- СТАНЦИЯ 3: ИГРА -->
-  <div id="station2" class="station-content">
-    <h2>🎮 Станция 3: Игра-квиз</h2>
-    <p class="subtitle">Ответьте на 3 вопроса, чтобы проверить, насколько хорошо вы усвоили принципы.</p>
-
-    <div id="quiz-container">
-      <!-- Вопросы будут сгенерированы через JS -->
-    </div>
-
-    <div class="flex-between mt-20">
-      <button class="btn outline" id="btnSubmitQuiz" onclick="checkQuiz()">Завершить квиз</button>
-      <button class="btn hidden" id="btnFinishLesson" onclick="finishLesson()">Завершить занятие 🏁</button>
-    </div>
-  </div>
-
-  <!-- ФИНАЛЬНЫЙ ЭКРАН -->
-  <div id="finalScreen" class="station-content final-screen">
-    <h2>🎉 Отлично! Занятие завершено!</h2>
-    <p class="subtitle">Вы прошли все три станции. Давайте подведем итоги.</p>
-    
-    <div class="stats">
-      <div class="stat-box">
-        <div class="num" id="finalScore">0</div>
-        <div class="label">Правильных ответов</div>
-      </div>
-      <div class="stat-box">
-        <div class="num" id="finalPercent">0%</div>
-        <div class="label">Успешность</div>
-      </div>
-    </div>
-
-    <div style="background: #f8fafc; padding: 20px; border-radius: 16px; max-width: 600px; margin: 0 auto 30px; text-align: left; border: 1px solid var(--border);">
-      <h3 style="font-size: 16px; margin-bottom: 10px; color: var(--primary-dark);">📝 Рефлексия (устно)</h3>
-      <ul style="padding-left: 20px; font-size: 14px; color: var(--text-light); line-height: 1.8;">
-        <li>Какой из принципов обучения ИЯ показался вам наиболее сложным для реализации на практике?</li>
-        <li>Почему принцип личностно-ориентированной направленности считается системообразующим?</li>
-        <li>Как формат «ротации станций» помог вам понять материал?</li>
-      </ul>
-    </div>
-
-    <button class="btn" onclick="location.reload()">Пройти заново 🔄</button>
-  </div>
-</div>
-
-<script>
-  // === НАСТРОЙКИ ТАЙМЕРА ===
-  let totalTime = 90 * 60; // 90 минут в секундах
-  let timerInterval;
-  const timerDisplay = document.getElementById('timerDisplay');
-  const timerBox = document.getElementById('timerBox');
-  let isTimerRunning = false;
-
-  function updateTimer() {
-    const minutes = Math.floor(totalTime / 60);
-    const seconds = totalTime % 60;
-    timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-    
-    if (totalTime <= 300) { // Последние 5 минут
-      timerBox.classList.add('danger');
-    }
-    
-    if (totalTime <= 0) {
-      clearInterval(timerInterval);
-      timerDisplay.textContent = "00:00";
-      alert("Время вышло! Занятие завершено.");
-      finishLesson();
-    }
-    totalTime--;
-  }
-
-  function startTimer() {
-    if (!isTimerRunning) {
-      isTimerRunning = true;
-      timerInterval = setInterval(updateTimer, 1000);
-    }
-  }
-
-  // === УПРАВЛЕНИЕ ЭТАПАМИ ===
-  function startLesson() {
-    document.getElementById('introScreen').classList.remove('active');
-    document.getElementById('introScreen').classList.add('hidden');
-    document.getElementById('stationNav').classList.remove('hidden');
-    
-    startTimer();
-    switchStation(0);
-  }
-
-  function switchStation(index) {
-    // Скрыть все станции
-    document.querySelectorAll('.station-content').forEach(el => el.classList.remove('active'));
-    // Показать нужную
-    document.getElementById(`station${index}`).classList.add('active');
-    
-    // Обновить вкладки
-    document.querySelectorAll('.station-tab').forEach((el, i) => {
-      el.classList.remove('active');
-      if (i === index) el.classList.add('active');
-      if (i < index) el.classList.add('completed');
-    });
-  }
-
-  // === СТАНЦИЯ 1: С ПЕДАГОГОМ ===
-  function checkTeacherStation() {
-    const selects = document.querySelectorAll('#station0 .match-select');
-    let correctCount = 0;
-    
-    selects.forEach(select => {
-      if (select.value === select.dataset.answer) {
-        select.classList.add('correct');
-        select.classList.remove('wrong');
-        select.disabled = true;
-        correctCount++;
-      } else if (select.value !== "") {
-        select.classList.add('wrong');
-        select.classList.remove('correct');
-      }
-    });
-
-    if (correctCount === 4) {
-      document.getElementById('btnNextFromTeacher').classList.remove('hidden');
-      alert("Превосходно! Все принципы соотнесены верно. Вы отлично знаете теорию.");
-    } else {
-      alert(`Вы ответили правильно на ${correctCount} из 4. Проверьте красные поля и попробуйте еще раз (или двигайтесь дальше).`);
-      // Разрешаем переход даже с ошибками, чтобы не застрять
-      document.getElementById('btnNextFromTeacher').classList.remove('hidden');
-    }
-  }
-
-  // === СТАНЦИЯ 2: МИНИ-ПРОЕКТ ===
-  let selectedCard = null;
-  let projectScore = 0;
-
-  function selectCard(card) {
-    // Снять выделение с других
-    document.querySelectorAll('.draggable-card').forEach(c => c.classList.remove('selected'));
-    // Выделить текущую
-    card.classList.add('selected');
-    selectedCard = card;
-  }
-
-  function dropCard(colType) {
-    if (!selectedCard) {
-      alert("Сначала выберите карточку из пула внизу!");
-      return;
-    }
-
-    const targetContainer = document.getElementById(`col-${colType}-cards`);
-    const originalType = selectedCard.dataset.type;
-
-    // Перемещаем карточку
-    targetContainer.appendChild(selectedCard);
-    selectedCard.classList.remove('selected');
-    
-    // Проверяем правильность
-    if (originalType === colType) {
-      selectedCard.style.borderColor = 'var(--success)';
-      selectedCard.style.background = '#f0fdf4';
-      selectedCard.style.color = '#047857';
-      projectScore++;
-    } else {
-      selectedCard.style.borderColor = 'var(--danger)';
-      selectedCard.style.background = '#fef2f2';
-      selectedCard.style.color = '#b91c1c';
-    }
-
-    selectedCard.onclick = function() {
-      // Возврат в пул при клике на размещенную карточку
-      document.getElementById('cards-pool').appendChild(this);
-      this.style.borderColor = '';
-      this.style.background = '';
-      this.style.color = '';
-      this.onclick = function() { selectCard(this); };
-    };
-    
-    selectedCard = null;
-  }
-
-  function checkProjectStation() {
-    const poolCards = document.querySelectorAll('#cards-pool .draggable-card').length;
-    
-    if (poolCards > 0) {
-      alert("Распределите все карточки по колонкам!");
-      return;
-    }
-
-    if (projectScore === 6) {
-      alert("Идеально! Вы отлично разбираетесь в классификации принципов.");
-    } else {
-      alert(`Вы правильно распределили ${projectScore} из 6 карточек. Красные карточки можно вернуть в пул и исправить.`);
-    }
-    document.getElementById('btnNextFromProject').classList.remove('hidden');
-  }
-
-  // === СТАНЦИЯ 3: ИГРА ===
-  const quizData = [
-    {
-      question: "Какой принцип предполагает, что обучающийся является субъектом учебно-воспитательного процесса?",
-      options: ["Принцип сознательности", "Принцип личностно-ориентированной направленности", "Принцип активности", "Принцип творческого характера"],
-      correct: 1
-    },
-    {
-      question: "Согласно тексту, в чем заключается принцип сознательности?",
-      options: [
-        "В механической выработке речевых навыков",
-        "В заучивании грамматических правил",
-        "В овладении языком как средством общения и формирования картины мира",
-        "В строгом следовании инструкциям учителя"
-      ],
-      correct: 2
-    },
-    {
-      question: "Почему обучение ИЯ должно строиться как творческий процесс?",
-      options: [
-        "Чтобы ученики могли списывать друг у друга",
-        "Чтобы избежать монотонности и развивать креативность",
-        "Чтобы учитель мог меньше готовиться к урокам",
-        "Потому что это требует меньше усилий со стороны ученика"
-      ],
-      correct: 1
-    }
-  ];
-
-  let quizScore = 0;
-  let quizAnswers = {};
-
-  function renderQuiz() {
-    const container = document.getElementById('quiz-container');
-    container.innerHTML = quizData.map((q, idx) => `
-      <div class="teacher-task" style="margin-bottom: 20px;">
-        <div class="task-label">Вопрос ${idx + 1} из 3</div>
-        <div class="quiz-question">${q.question}</div>
-        <div class="quiz-options">
-          ${q.options.map((opt, oIdx) => `
-            <div class="quiz-option" onclick="selectQuizOption(${idx}, ${oIdx}, this)">${opt}</div>
-          `).join('')}
+        <div class="footer-note">
+            <span>🐱 click any card to reveal meaning</span>
+            <span>🐾 learn & test yourself</span>
         </div>
-      </div>
-    `).join('');
-  }
+    </div>
 
-  function selectQuizOption(qIdx, oIdx, element) {
-    // Снять выделение с других вариантов этого вопроса
-    const parent = element.parentElement;
-    parent.querySelectorAll('.quiz-option').forEach(el => el.classList.remove('selected'));
-    
-    element.classList.add('selected');
-    quizAnswers[qIdx] = oIdx;
-  }
+    <div id="notif" class="floating-notif"></div>
 
-  function checkQuiz() {
-    if (Object.keys(quizAnswers).length < quizData.length) {
-      alert("Ответьте на все вопросы квиза!");
-      return;
-    }
+    <script>
+        const vocabData = [
+            { word: "warm breeze", def: "a gentle, mild wind", example: "A warm breeze drifted through the open window." },
+            { word: "sway", def: "to move slowly and rhythmically from side to side", example: "The palm trees sway in the tropical wind." },
+            { word: "breathe in", def: "to inhale deeply; to take air into the lungs", example: "Breathe in the fresh mountain air." },
+            { word: "shine", def: "to reflect light; to glow brightly", example: "The sun began to shine after the rain." },
+            { word: "grey clouds fill the sky", def: "a descriptive phrase for a gloomy day", example: "Grey clouds fill the sky, promising rain." },
+            { word: "squash together", def: "to press tightly into a small space", example: "We had to squash together in the back seat." },
+            { word: "ache", def: "to experience a continuous dull pain", example: "My muscles ache after the long hike." },
+            { word: "flat grasslands", def: "wide, open areas of land covered in grass", example: "The savanna is full of flat grasslands." },
+            { word: "beat down", def: "(of the sun) to shine very strongly and hotly", example: "The sun beat down on the desert." },
+            { word: "cloudless sky", def: "a sky with no clouds; completely clear", example: "Under a cloudless sky, the stars were brilliant." },
+            { word: "cicadas", def: "insects that make a loud, high-pitched buzzing sound in hot weather", example: "The cicadas sang all through the summer night." },
+            { word: "fill my nostrils", def: "to describe a very strong smell entering your nose", example: "The scent of jasmine filled my nostrils." },
+            { word: "when you least expect it", def: "when you are not anticipating or planning for something", example: "Happiness arrives when you least expect it." },
+            { word: "end up in", def: "to finally arrive somewhere, usually without planning to", example: "We got lost and ended up in a tiny village." },
+            { word: "just for an instant", def: "for a very short moment", example: "Just for an instant, I thought I saw a deer." },
+            { word: "like books on a shelf", def: "a simile used to describe people packed tightly together", example: "The commuters stood like books on a shelf." },
+            { word: "feel a bit numb", def: "to feel emotionally empty or unable to feel anything", example: "After the news, I felt a bit numb." },
+            { word: "be grateful for", def: "to feel thankful for something", example: "I am grateful for your kindness." },
+            { word: "take my breath away", def: "an idiom meaning something was incredibly beautiful or amazing", example: "The view from the cliff took my breath away." },
+            { word: "bustling", def: "a word to describe a very busy, active place", example: "The bustling market was full of colors and noise." },
+            { word: "sway like dancers", def: "to move gracefully like a dancer", example: "The flowers sway like dancers in the breeze." },
+            { word: "be squashed together like books on a shelf", def: "to be packed very tightly", example: "In the elevator we were squashed together like books on a shelf." },
+            { word: "feel like being roasted in an oven", def: "to feel extremely hot", example: "Without air conditioning, I felt like being roasted in an oven." },
+            { word: "cicadas sing", def: "personification of insects making noise", example: "The cicadas sing in the heat of July." },
+            { word: "happiness happens when", def: "starting a general statement about a concept", example: "Happiness happens when you stop comparing yourself." },
+            { word: "believe that", def: "to express a personal opinion", example: "I believe that kindness changes the world." },
+            { word: "as the train comes into", def: "setting a scene with simultaneous actions", example: "As the train comes into the station, people gather their bags." },
+            { word: "realise at that moment that", def: "to express a sudden realization", example: "I realise at that moment that I forgot my keys." },
+            { word: "think about things to be grateful for", def: "to list things you are thankful for", example: "Every night, think about things to be grateful for." },
+            { word: "how can you not be happy in a place like this", def: "using a rhetorical question to express emotion", example: "With such beauty, how can you not be happy in a place like this?" },
+            { word: "cicadas (buzzing)", def: "insects that make a loud, high-pitched buzzing sound in hot weather", example: "The cicadas' buzz is the soundtrack of summer." },
+            { word: "warm breeze (soft wind)", def: "a gentle, mild wind", example: "The warm breeze carried the scent of pine." }
+        ];
 
-    quizScore = 0;
-    quizData.forEach((q, idx) => {
-      const selectedIdx = quizAnswers[idx];
-      const options = document.querySelectorAll(`#quiz-container > div:nth-child(${idx + 1}) .quiz-option`);
-      
-      if (selectedIdx === q.correct) {
-        options[selectedIdx].classList.add('correct');
-        quizScore++;
-      } else {
-        options[selectedIdx].classList.add('wrong');
-        options[q.correct].classList.add('correct');
-      }
-      // Блокируем дальнейшие клики
-      options.forEach(opt => opt.style.pointerEvents = 'none');
-    });
+        let learnedSet = new Set();
+        let quizScore = 0;
+        let streak = 0;
+        let currentQuestion = null;
+        let currentCorrectIndex = -1;
+        let quizAnswered = false;
 
-    document.getElementById('btnSubmitQuiz').classList.add('hidden');
-    document.getElementById('btnFinishLesson').classList.remove('hidden');
-    
-    alert(`Квиз завершен! Ваш результат: ${quizScore} из 3.`);
-  }
+        const cardGrid = document.getElementById('cardGrid');
+        const learnedCountSpan = document.getElementById('learnedCount');
+        const quizScoreSpan = document.getElementById('quizScore');
+        const streakSpan = document.getElementById('streakCount');
+        const exploreView = document.getElementById('exploreView');
+        const quizView = document.getElementById('quizView');
+        const modeBtns = document.querySelectorAll('.mode-btn');
+        const notif = document.getElementById('notif');
 
-  // === ЗАВЕРШЕНИЕ ===
-  function finishLesson() {
-    clearInterval(timerInterval);
-    
-    // Считаем общий результат
-    // Станция 1: макс 4
-    // Станция 2: макс 6
-    // Станция 3: макс 3
-    // Всего: 13
-    
-    // Для простоты берем результаты, которые уже посчитаны, но так как мы не сохраняли ответы 1 станции в глобальную, 
-    // просто выведем результат квиза и проекта.
-    let totalCorrect = quizScore + projectScore; // Из первой станции не считаем для упрощения, так как там есть кнопка "дальше"
-    // Сделаем красивый подсчет:
-    let percent = Math.round((totalCorrect / 9) * 100); // 9 - это макс баллов за 2 и 3 станцию (6+3)
-    
-    document.getElementById('finalScore').textContent = `${totalCorrect} / 9`;
-    document.getElementById('finalPercent').textContent = `${percent}%`;
+        function showNotification(msg, duration = 2000) {
+            notif.textContent = msg;
+            notif.classList.add('show');
+            clearTimeout(notif._timer);
+            notif._timer = setTimeout(() => notif.classList.remove('show'), duration);
+        }
 
-    document.querySelectorAll('.station-content').forEach(el => el.classList.remove('active'));
-    document.getElementById('finalScreen').classList.add('active');
-    document.getElementById('stationNav').classList.add('hidden');
-  }
+        function updateStatsUI() {
+            learnedCountSpan.textContent = learnedSet.size;
+            quizScoreSpan.textContent = quizScore;
+            streakSpan.textContent = streak;
+        }
 
-  // Инициализация квиза
-  renderQuiz();
+        function renderCards() {
+            cardGrid.innerHTML = '';
+            vocabData.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.dataset.index = index;
+                if (learnedSet.has(index)) card.classList.add('revealed');
 
-</script>
+                let emoji = '🐈';
+                if (item.word.includes('sun') || item.word.includes('shine') || item.word.includes('beat')) emoji = '☀️';
+                else if (item.word.includes('cicada')) emoji = '🦗';
+                else if (item.word.includes('cloud')) emoji = '☁️';
+                else if (item.word.includes('breeze') || item.word.includes('sway')) emoji = '🍃';
+                else if (item.word.includes('breath')) emoji = '💨';
+                else if (item.word.includes('grateful') || item.word.includes('happiness')) emoji = '😺';
+                else if (item.word.includes('book')) emoji = '📚';
+                else if (item.word.includes('train')) emoji = '🚆';
+                else if (item.word.includes('bustling')) emoji = '🏙️';
+                else if (item.word.includes('oven') || item.word.includes('roasted')) emoji = '🔥';
+                else if (item.word.includes('ache') || item.word.includes('numb')) emoji = '💭';
+                else if (item.word.includes('grass')) emoji = '🌾';
+
+                card.innerHTML =
+                    '<div class="word">' + emoji + ' ' + item.word + '</div>' +
+                    '<div class="hint">click to reveal meaning</div>' +
+                    '<div class="answer"><p>' + item.def + '</p><div class="example">' + item.example + '</div></div>';
+
+                card.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const idx = parseInt(card.dataset.index);
+                    if (card.classList.contains('revealed')) {
+                        card.classList.remove('revealed');
+                        learnedSet.delete(idx);
+                    } else {
+                        card.classList.add('revealed');
+                        learnedSet.add(idx);
+                    }
+                    updateStatsUI();
+                });
+
+                cardGrid.appendChild(card);
+            });
+            updateStatsUI();
+        }
+
+        function generateQuizQuestion() {
+            const correctIndex = Math.floor(Math.random() * vocabData.length);
+            const correctItem = vocabData[correctIndex];
+            const wrongIndices = new Set();
+            while (wrongIndices.size < 3) {
+                const rand = Math.floor(Math.random() * vocabData.length);
+                if (rand !== correctIndex) wrongIndices.add(rand);
+            }
+            const options = [correctItem.def];
+            wrongIndices.forEach(i => options.push(vocabData[i].def));
+            for (let i = options.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [options[i], options[j]] = [options[j], options[i]];
+            }
+            currentQuestion = { word: correctItem.word, options: options };
+            currentCorrectIndex = options.indexOf(correctItem.def);
+            quizAnswered = false;
+            renderQuizQuestion();
+        }
+
+        function renderQuizQuestion() {
+            if (!currentQuestion) return;
+            document.getElementById('quizQuestion').innerHTML = 'What does "<strong>' + currentQuestion.word + '</strong>" mean?';
+            const optionsDiv = document.getElementById('quizOptions');
+            optionsDiv.innerHTML = '';
+            currentQuestion.options.forEach((opt, idx) => {
+                const btn = document.createElement('div');
+                btn.className = 'quiz-option';
+                btn.textContent = opt;
+                btn.addEventListener('click', () => handleQuizAnswer(idx));
+                optionsDiv.appendChild(btn);
+            });
+            document.getElementById('quizFeedback').textContent = '';
+            quizAnswered = false;
+        }
+
+        function handleQuizAnswer(selectedIdx) {
+            if (quizAnswered) return;
+            quizAnswered = true;
+            const options = document.querySelectorAll('.quiz-option');
+            const isCorrect = (selectedIdx === currentCorrectIndex);
+            options.forEach((opt, idx) => {
+                if (idx === currentCorrectIndex) opt.classList.add('correct');
+                else if (idx === selectedIdx && !isCorrect) opt.classList.add('wrong');
+            });
+            if (isCorrect) {
+                quizScore++;
+                streak++;
+                document.getElementById('quizFeedback').innerHTML = '✅ Correct! Great job, little cat.';
+                showNotification('🐾 Correct! Streak: ' + streak);
+            } else {
+                streak = 0;
+                document.getElementById('quizFeedback').innerHTML = '❌ Oops! The correct definition is highlighted.';
+                showNotification('😿 Not quite. Keep going!');
+            }
+            updateStatsUI();
+        }
+
+        function setMode(mode) {
+            modeBtns.forEach(btn => btn.classList.toggle('active', btn.dataset.mode === mode));
+            if (mode === 'explore') {
+                exploreView.style.display = 'block';
+                quizView.classList.remove('active');
+                quizView.style.display = 'none';
+            } else {
+                exploreView.style.display = 'none';
+                quizView.style.display = 'block';
+                quizView.classList.add('active');
+                if (!currentQuestion) generateQuizQuestion();
+            }
+        }
+
+        modeBtns.forEach(btn => btn.addEventListener('click', () => setMode(btn.dataset.mode)));
+        document.getElementById('revealAllBtn').addEventListener('click', () => {
+            vocabData.forEach((_, idx) => learnedSet.add(idx));
+            renderCards();
+            showNotification('🐱✨ All cards revealed!');
+        });
+        document.getElementById('resetAllBtn').addEventListener('click', () => {
+            learnedSet.clear();
+            renderCards();
+            showNotification('🐾 All cards reset.');
+        });
+        document.getElementById('nextQuestionBtn').addEventListener('click', generateQuizQuestion);
+        document.getElementById('resetQuizBtn').addEventListener('click', () => {
+            quizScore = 0;
+            streak = 0;
+            updateStatsUI();
+            generateQuizQuestion();
+            showNotification('🔄 Quiz reset. New question!');
+        });
+
+        renderCards();
+        generateQuizQuestion();
+        updateStatsUI();
+        setMode('explore');
+    </script>
 </body>
 </html>
