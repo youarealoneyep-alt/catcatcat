@@ -562,4 +562,156 @@ function renderRoadmap(){
   };
   const riskText = riskMap[state.scenario.risk] || 'не выбран';
   const aiRole = state.scenario.aiRole || 'ассистент обратной связи';
-  const teacherRole = state.scenario.teacherRole || 'фасилита
+  const teacherRole = state.scenario.teacherRole || 'фасилитатор и наставник';
+
+  area.innerHTML = `
+    <div class="card">
+      <h2><span class="ico">🗺️</span> Шаг 5. Дорожная карта</h2>
+      <p class="sub">Итог вашей форсайт-сессии. Ниже — синтез выбранных трендов, сценария и методики статьи.</p>
+
+      <div class="roadmap">
+        <h3>Сценарий на ${state.scenario.horizon} год</h3>
+        <div class="r-item">
+          <div class="r-num">1</div>
+          <div class="r-text"><strong>Роль ИИ:</strong> ${aiRole}</div>
+        </div>
+        <div class="r-item">
+          <div class="r-num">2</div>
+          <div class="r-text"><strong>Роль преподавателя:</strong> ${teacherRole}</div>
+        </div>
+        <div class="r-item">
+          <div class="r-num">3</div>
+          <div class="r-text"><strong>Ключевой риск:</strong> ${riskText}</div>
+        </div>
+        <div class="r-item">
+          <div class="r-num">4</div>
+          <div class="r-text"><strong>Выбранные тренды:</strong> ${selected.length ? selected.map(t => t.title).join(', ') : 'не выбраны'}</div>
+        </div>
+        <div class="r-item">
+          <div class="r-num">5</div>
+          <div class="r-text"><strong>Методика:</strong> 11 этапов обучения письму в триаде «обучающийся — преподаватель — ИИ» с аудиторным обсуждением обратной связи от ИИ (этапы 6 и 9).</div>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn ghost" id="backBtn">← Назад</button>
+        <button class="btn" id="nextBtn">К рефлексии →</button>
+      </div>
+    </div>
+  `;
+  document.getElementById('backBtn').addEventListener('click', () => goTo(4));
+  document.getElementById('nextBtn').addEventListener('click', () => goTo(6));
+}
+
+/* =========================================================
+   7. РЕФЛЕКСИЯ
+   ========================================================= */
+function renderReflect(){
+  area.innerHTML = `
+    <div class="card">
+      <h2><span class="ico">💭</span> Шаг 6. Рефлексия</h2>
+      <p class="sub">Ответьте на вопросы — это завершающий этап форсайт-сессии (соответствует 11-му этапу методики).</p>
+
+      <div class="reflect">
+        <div class="reflect-item">
+          <label>Что нового вы узнали о роли ИИ в образовании?</label>
+          <textarea id="rWhat" placeholder="Ваш ответ..."></textarea>
+        </div>
+        <div class="reflect-item">
+          <label>Как изменилось ваше представление о роли преподавателя?</label>
+          <textarea id="rHow" placeholder="Ваш ответ..."></textarea>
+        </div>
+        <div class="reflect-item">
+          <label>Какой главный риск вы видите и как его снизить?</label>
+          <textarea id="rRisk" placeholder="Ваш ответ..."></textarea>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn ghost" id="backBtn">← Назад</button>
+        <button class="btn teal" id="finishBtn">Завершить сессию ✓</button>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('rWhat').value = state.reflection.what;
+  document.getElementById('rHow').value = state.reflection.how;
+  document.getElementById('rRisk').value = state.reflection.risk;
+
+  document.getElementById('backBtn').addEventListener('click', () => goTo(5));
+  document.getElementById('finishBtn').addEventListener('click', () => {
+    state.reflection.what = document.getElementById('rWhat').value.trim();
+    state.reflection.how = document.getElementById('rHow').value.trim();
+    state.reflection.risk = document.getElementById('rRisk').value.trim();
+    renderFinal();
+  });
+}
+
+/* =========================================================
+   ФИНАЛЬНЫЙ ЭКРАН
+   ========================================================= */
+function renderFinal(){
+  const selected = [...state.selectedTrends].map(i => TRENDS[i]);
+  const riskMap = {
+    plagiarism: 'Плагиат и генерация текстов ИИ',
+    teacher: 'Исключение преподавателя',
+    content: 'Неспособность ИИ оценить содержание',
+    access: 'Неравный доступ к ИИ'
+  };
+  const riskText = riskMap[state.scenario.risk] || 'не выбран';
+
+  area.innerHTML = `
+    <div class="card" style="text-align:center">
+      <div style="font-size:60px;margin-bottom:10px">🎓</div>
+      <h2 style="justify-content:center"><span class="ico">✨</span> Форсайт-сессия завершена!</h2>
+      <p class="sub" style="margin-bottom:24px">Вы прошли все этапы: от знакомства со статьёй до построения сценария будущего и рефлексии.</p>
+
+      <div style="text-align:left;max-width:640px;margin:0 auto">
+        <div class="article-box" style="border-left-color:var(--teal);background:#f0fdfa">
+          <div class="label" style="color:var(--teal)">Ваш итоговый сценарий</div>
+          <p><strong>Горизонт:</strong> ${state.scenario.horizon} год</p>
+          <p><strong>Роль ИИ:</strong> ${state.scenario.aiRole || 'ассистент обратной связи'}</p>
+          <p><strong>Роль преподавателя:</strong> ${state.scenario.teacherRole || 'фасилитатор и наставник'}</p>
+          <p><strong>Ключевой риск:</strong> ${riskText}</p>
+          <p><strong>Тренды:</strong> ${selected.length ? selected.map(t => t.title).join(', ') : 'не выбраны'}</p>
+        </div>
+
+        <div class="article-box" style="border-left-color:var(--amber);background:#fffbeb">
+          <div class="label" style="color:#92400e">Главный вывод статьи</div>
+          <p>ИИ не заменяет преподавателя, а дополняет его. Триада <strong>«обучающийся — преподаватель — искусственный интеллект»</strong> обогащает традиционную методику новыми возможностями для развития речевых умений.</p>
+        </div>
+
+        ${state.reflection.what || state.reflection.how || state.reflection.risk ? `
+        <div class="article-box">
+          <div class="label">Ваша рефлексия</div>
+          ${state.reflection.what ? `<p><strong>Новое:</strong> ${state.reflection.what}</p>` : ''}
+          ${state.reflection.how ? `<p><strong>Роль преподавателя:</strong> ${state.reflection.how}</p>` : ''}
+          ${state.reflection.risk ? `<p><strong>Риск и решение:</strong> ${state.reflection.risk}</p>` : ''}
+        </div>` : ''}
+      </div>
+
+      <div class="btn-row" style="justify-content:center">
+        <button class="btn ghost" id="restartBtn">🔄 Пройти заново</button>
+        <button class="btn" id="printBtn">🖨 Распечатать итог</button>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('restartBtn').addEventListener('click', () => {
+    state.step = 0;
+    state.selectedTrends.clear();
+    state.scenario = { horizon:'2030', aiRole:'', teacherRole:'', risk:'' };
+    state.reflection = { what:'', how:'', risk:'' };
+    goTo(0);
+  });
+  document.getElementById('printBtn').addEventListener('click', () => window.print());
+}
+
+/* =========================================================
+   ЗАПУСК
+   ========================================================= */
+renderSteps();
+renderStage();
+</script>
+</body>
+</html>
