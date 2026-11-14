@@ -70,7 +70,7 @@
     aspect-ratio:1;
     background:#fff;
     border-radius:16px;
-    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    display:flex;align-items:center;justify-content:center;
     cursor:pointer;
     border:3px solid transparent;
     transition:transform .12s, border-color .2s, box-shadow .15s, background .2s;
@@ -78,18 +78,22 @@
     position:relative;
     user-select:none;
     overflow:hidden;
+    padding:8px;
   }
   .plate::before{
     content:"";position:absolute;inset:6px;border-radius:12px;
     border:2px dashed #f1f5f9;pointer-events:none;
   }
   .plate:hover:not(.disabled){transform:translateY(-3px) scale(1.03);border-color:#fbbf24;box-shadow:0 10px 20px -8px rgba(251,191,36,.7)}
-  .plate .emoji{font-size:clamp(28px,5vw,44px);line-height:1;filter:drop-shadow(0 2px 3px rgba(0,0,0,.15))}
-  .plate .label{
-    font-size:clamp(9px,1.4vw,11.5px);font-weight:800;color:var(--muted);
-    margin-top:4px;text-transform:uppercase;letter-spacing:.03em;
-    text-align:center;padding:0 4px;
+  
+  .plate .emoji{
+    font-size:clamp(44px, 9vw, 80px);
+    line-height:1;
+    filter:drop-shadow(0 3px 5px rgba(0,0,0,.18));
+    transition:transform .2s;
   }
+  .plate:hover .emoji{transform:scale(1.08)}
+
   .plate.correct{
     background:#dcfce7;border-color:var(--green);
     animation:pop .35s ease;
@@ -201,18 +205,9 @@
     font-size:14px;line-height:1.7;margin-bottom:22px;
   }
   .start-card .rules b{color:var(--indigo-d)}
-  .start-card .word-list{
-    display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:22px;
-  }
-  .start-card .word-list span{
-    font-size:12px;font-weight:700;background:#eef2ff;color:var(--indigo-d);
-    padding:5px 10px;border-radius:99px;
-  }
 
   @media(max-width:600px){
     .grid{grid-template-columns:repeat(3,1fr);gap:8px}
-    .plate .emoji{font-size:32px}
-    .plate .label{font-size:8.5px}
     .word-display{font-size:24px}
     .top h1{font-size:15px}
     .stat{font-size:11px;padding:5px 10px}
@@ -242,12 +237,8 @@
       <b>Правила:</b><br>
       ✅ Клик по правильному продукту — <b>+1 очко</b>.<br>
       ❌ Ошибка или истечение 10 секунд — <b>−1 жизнь</b> (всего 3).<br>
-      ⏱ Полоска под словом показывает оставшееся время.
-    </div>
-    <div class="word-list">
-      <span>avocado</span><span>beetroot</span><span>blueberry</span><span>broccoli</span>
-      <span>cauliflower</span><span>cinnamon</span><span>honey</span><span>lentils</span>
-      <span>mushroom</span><span>oats</span><span>salmon</span><span>walnuts</span>
+      ⏱ Полоска под словом показывает оставшееся время.<br>
+      🖼️ Названия продуктов не подписаны — узнавай по внешнему виду!
     </div>
     <button class="btn" style="font-size:17px;padding:14px 40px" onclick="startGame()">Начать игру 🚀</button>
   </div>
@@ -285,18 +276,18 @@
    СЛОВАРЬ B2: FOOD
    ========================================================= */
 const FOODS = [
-  { id:'avocado',    emoji:'🥑', word:'avocado',    label:'Avocado' },
-  { id:'beetroot',   emoji:'🟣', word:'beetroot',   label:'Beetroot' },
-  { id:'blueberry',  emoji:'🫐', word:'blueberry',  label:'Blueberry' },
-  { id:'broccoli',   emoji:'🥦', word:'broccoli',   label:'Broccoli' },
-  { id:'cauliflower',emoji:'🥬', word:'cauliflower',label:'Cauliflower' },
-  { id:'cinnamon',   emoji:'🪵', word:'cinnamon',   label:'Cinnamon' },
-  { id:'honey',      emoji:'🍯', word:'honey',      label:'Honey' },
-  { id:'lentils',    emoji:'🫘', word:'lentils',    label:'Lentils' },
-  { id:'mushroom',   emoji:'🍄', word:'mushroom',   label:'Mushroom' },
-  { id:'oats',       emoji:'🌾', word:'oats',       label:'Oats' },
-  { id:'salmon',     emoji:'🐟', word:'salmon',     label:'Salmon' },
-  { id:'walnuts',    emoji:'🌰', word:'walnuts',    label:'Walnuts' }
+  { id:'avocado',    emoji:'🥑' },
+  { id:'beetroot',   emoji:'🟣' },
+  { id:'blueberry',  emoji:'🫐' },
+  { id:'broccoli',   emoji:'🥦' },
+  { id:'cauliflower',emoji:'🥬' },
+  { id:'cinnamon',   emoji:'🪵' },
+  { id:'honey',      emoji:'🍯' },
+  { id:'lentils',    emoji:'🫘' },
+  { id:'mushroom',   emoji:'🍄' },
+  { id:'oats',       emoji:'🌾' },
+  { id:'salmon',     emoji:'🐟' },
+  { id:'walnuts',    emoji:'🌰' }
 ];
 
 /* =========================================================
@@ -316,6 +307,7 @@ const game = {
   currentWordId: null,
   currentWordObj: null,
   wordStartTime: 0,
+  pausedAt: 0,
   rafId: null,
   shuffleQueue: [],
   handledThisWord: false
@@ -340,6 +332,7 @@ function startGame(){
   game.lives = 3;
   game.shuffleQueue = [];
   game.handledThisWord = false;
+  game.pausedAt = 0;
 
   updateStats();
   buildGrid();
@@ -348,21 +341,17 @@ function startGame(){
 }
 
 /* =========================================================
-   СТОЛ
+   СТОЛ (только картинки, без подписей)
    ========================================================= */
 function buildGrid(){
   const grid = $('grid');
   grid.innerHTML = '';
-  // Перемешиваем продукты на столе каждый раз
   const shuffled = [...FOODS].sort(() => Math.random() - 0.5);
   shuffled.forEach(f => {
     const plate = document.createElement('div');
     plate.className = 'plate';
     plate.dataset.id = f.id;
-    plate.innerHTML = `
-      <div class="emoji">${f.emoji}</div>
-      <div class="label">${f.label}</div>
-    `;
+    plate.innerHTML = `<div class="emoji">${f.emoji}</div>`;
     plate.addEventListener('click', () => onPlateClick(f.id, plate));
     grid.appendChild(plate);
   });
@@ -372,7 +361,6 @@ function buildGrid(){
    СЛЕДУЮЩЕЕ СЛОВО
    ========================================================= */
 function nextWord(){
-  // Если очередь пуста — перемешиваем заново
   if(game.shuffleQueue.length === 0){
     game.shuffleQueue = [...FOODS].sort(() => Math.random() - 0.5);
   }
@@ -384,7 +372,7 @@ function nextWord(){
   game.handledThisWord = false;
 
   const display = $('wordDisplay');
-  display.textContent = next.word;
+  display.textContent = next.id;
   display.classList.remove('ok', 'err');
 
   const bar = $('timeBar');
@@ -410,7 +398,6 @@ function gameLoop(now){
       bar.classList.add('danger');
     }
 
-    // Если время вышло, а клика не было
     if(remaining <= 0 && !game.handledThisWord){
       handleTimeout();
     }
@@ -434,7 +421,6 @@ function onPlateClick(id, plate){
     display.classList.add('ok');
     updateStats();
     
-    // Небольшая задержка перед следующим словом
     setTimeout(() => {
       plate.classList.remove('correct');
       if(game.active) nextWord();
@@ -498,14 +484,12 @@ function togglePause(){
   const btn = $('pauseBtn');
   if(game.paused){
     btn.textContent = '▶ Продолжить';
-    // Замораживаем таймер, запоминая, сколько прошло
     game.pausedAt = performance.now();
   } else {
     btn.textContent = '⏸ Пауза';
-    // Сдвигаем время старта, чтобы компенсировать паузу
     if(game.pausedAt){
       game.wordStartTime += (performance.now() - game.pausedAt);
-      game.pausedAt = null;
+      game.pausedAt = 0;
     }
   }
 }
