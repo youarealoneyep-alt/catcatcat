@@ -3,12 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Форсайт: Будущее образования с ИИ</title>
+<title>Форсайт-квест: Будущее образования с ИИ</title>
 <style>
   :root{
     --ink:#1e293b; --muted:#64748b; --line:#e2e8f0;
     --indigo:#4f46e5; --indigo-d:#4338ca;
     --teal:#0d9488; --amber:#f59e0b; --rose:#e11d48;
+    --green:#16a34a; --red:#dc2626;
     --bg:#f8fafc; --card:#ffffff;
     --shadow:0 10px 30px -12px rgba(15,23,42,.25);
   }
@@ -19,157 +20,148 @@
     color:var(--ink);line-height:1.55;min-height:100vh;
     padding:24px 14px 60px;
   }
-  .wrap{max-width:1080px;margin:0 auto}
+  .wrap{max-width:880px;margin:0 auto}
 
   /* Header */
-  header{
-    text-align:center;margin-bottom:28px;
-  }
+  header{text-align:center;margin-bottom:24px}
   .badge-top{
     display:inline-block;font-size:12px;font-weight:800;letter-spacing:.14em;
     text-transform:uppercase;color:var(--indigo);
     background:#e0e7ff;padding:7px 16px;border-radius:99px;margin-bottom:14px;
   }
   header h1{
-    font-size:34px;line-height:1.15;margin-bottom:10px;
+    font-size:30px;line-height:1.15;margin-bottom:8px;
     background:linear-gradient(120deg,var(--indigo),var(--teal));
     -webkit-background-clip:text;background-clip:text;color:transparent;
   }
-  header p{color:var(--muted);font-size:16px;max-width:720px;margin:0 auto}
+  header p{color:var(--muted);font-size:15px;max-width:640px;margin:0 auto}
 
-  /* Steps indicator */
-  .steps{
-    display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin:24px 0 30px;
+  /* Level map */
+  .level-map{
+    display:flex;justify-content:center;gap:8px;flex-wrap:wrap;
+    margin:22px 0 24px;
   }
-  .step-dot{
+  .level-node{
     display:flex;align-items:center;gap:8px;
     font-size:13px;font-weight:700;color:var(--muted);
     background:#fff;border:1.5px solid var(--line);
-    padding:8px 14px;border-radius:99px;transition:.25s;
+    padding:9px 14px;border-radius:99px;transition:.25s;
   }
-  .step-dot.active{
+  .level-node.active{
     color:#fff;background:linear-gradient(135deg,var(--indigo),var(--indigo-d));
     border-color:transparent;box-shadow:0 8px 20px -8px rgba(79,70,229,.7);
+    transform:scale(1.05);
   }
-  .step-dot.done{
-    color:var(--teal);border-color:#99f6e4;background:#f0fdfa;
-  }
-  .step-dot .num{
+  .level-node.done{color:var(--teal);border-color:#99f6e4;background:#f0fdfa}
+  .level-node.locked{opacity:.5}
+  .level-node .ln-ico{font-size:16px}
+  .level-node .ln-num{
     width:22px;height:22px;border-radius:50%;display:grid;place-items:center;
-    background:var(--line);color:var(--muted);font-size:12px;
+    background:var(--line);color:var(--muted);font-size:11px;font-weight:800;
   }
-  .step-dot.active .num{background:rgba(255,255,255,.25);color:#fff}
-  .step-dot.done .num{background:#ccfbf1;color:var(--teal)}
+  .level-node.active .ln-num{background:rgba(255,255,255,.25);color:#fff}
+  .level-node.done .ln-num{background:#ccfbf1;color:var(--teal)}
+
+  /* Progress */
+  .pbar-wrap{margin-bottom:22px}
+  .pbar{height:9px;background:#e2e8f0;border-radius:99px;overflow:hidden;margin-bottom:8px}
+  .pbar-fill{height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--indigo),var(--teal));transition:width .5s cubic-bezier(.4,0,.2,1)}
+  .pbar-labels{display:flex;justify-content:space-between;font-size:12px;font-weight:700;color:var(--muted)}
 
   /* Cards */
   .card{
-    background:var(--card);border-radius:20px;padding:28px;
+    background:var(--card);border-radius:20px;padding:26px;
     box-shadow:var(--shadow);border:1px solid var(--line);
-    margin-bottom:22px;animation:fade .4s ease;
+    margin-bottom:20px;animation:fade .4s ease;
   }
   @keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 
-  .card h2{
-    font-size:22px;margin-bottom:6px;display:flex;align-items:center;gap:10px;
-  }
-  .card h2 .ico{font-size:26px}
-  .card .sub{color:var(--muted);font-size:14.5px;margin-bottom:20px}
+  .card h2{font-size:21px;margin-bottom:6px;display:flex;align-items:center;gap:10px}
+  .card h2 .ico{font-size:24px}
+  .card .sub{color:var(--muted);font-size:14px;margin-bottom:18px}
 
   /* Article block */
   .article-box{
     background:#f1f5f9;border-left:5px solid var(--indigo);
-    border-radius:12px;padding:18px 20px;margin:18px 0;font-size:14.5px;
+    border-radius:12px;padding:16px 18px;margin:14px 0;font-size:14px;
   }
   .article-box .label{
     font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;
-    color:var(--indigo);margin-bottom:8px;
+    color:var(--indigo);margin-bottom:6px;
   }
-  .article-box p{margin-bottom:10px;color:#334155}
+  .article-box p{margin-bottom:8px;color:#334155}
   .article-box p:last-child{margin-bottom:0}
   .article-box strong{color:var(--indigo-d)}
 
   .quote{
     font-style:italic;color:var(--muted);
-    border-left:3px solid var(--amber);padding-left:14px;margin:14px 0;
-    font-size:14px;
+    border-left:3px solid var(--amber);padding-left:14px;margin:12px 0;font-size:13.5px;
   }
 
-  /* Trend grid */
-  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-top:16px}
-  .trend{
-    background:#f8fafc;border:1.5px solid var(--line);border-radius:14px;
-    padding:16px;transition:.2s;cursor:pointer;
+  /* Question */
+  .q-meta{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+  .q-badge{
+    font-size:11.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;
+    color:var(--indigo);background:#e0e7ff;padding:6px 12px;border-radius:99px;
   }
-  .trend:hover{border-color:var(--indigo);transform:translateY(-3px);box-shadow:0 12px 24px -16px rgba(79,70,229,.5)}
-  .trend .t-ico{font-size:24px;margin-bottom:8px}
-  .trend .t-title{font-weight:800;font-size:15px;margin-bottom:6px}
-  .trend .t-desc{font-size:13px;color:var(--muted);line-height:1.5}
+  .q-type{font-size:12px;font-weight:700;color:var(--muted)}
+  .q-emoji{font-size:40px;line-height:1;margin-bottom:8px}
+  .q-text{font-size:18px;line-height:1.45;font-weight:800;margin-bottom:18px}
 
-  /* Scenario builder */
-  .scenario-inputs{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
-  .scenario-inputs label{display:block;font-size:13px;font-weight:800;color:var(--muted);margin-bottom:6px}
-  .scenario-inputs select,.scenario-inputs input{
-    width:100%;font:inherit;font-size:14px;padding:12px 14px;
-    border-radius:12px;border:1.5px solid var(--line);background:#fff;
-    transition:.2s;
+  .options{display:flex;flex-direction:column;gap:10px}
+  .option{
+    position:relative;display:flex;align-items:center;gap:12px;width:100%;
+    text-align:left;font:inherit;font-size:15px;font-weight:600;color:var(--ink);
+    padding:13px 15px;border-radius:14px;border:2px solid #e2e8f0;background:#fff;
+    cursor:pointer;transition:.15s;
   }
-  .scenario-inputs select:focus,.scenario-inputs input:focus{
-    outline:none;border-color:var(--indigo);box-shadow:0 0 0 4px rgba(79,70,229,.12);
-  }
-
-  /* Triad */
-  .triad{
-    display:flex;justify-content:center;align-items:center;gap:14px;
-    flex-wrap:wrap;margin:20px 0;
-  }
-  .triad-node{
-    width:140px;padding:18px 10px;text-align:center;border-radius:16px;
-    background:#f8fafc;border:2px solid var(--line);transition:.25s;
-  }
-  .triad-node .n-ico{font-size:30px;margin-bottom:6px}
-  .triad-node .n-name{font-weight:800;font-size:13.5px}
-  .triad-node .n-role{font-size:11.5px;color:var(--muted);margin-top:4px}
-  .triad-node:hover{border-color:var(--indigo);background:#eef2ff}
-  .triad-arrow{font-size:24px;color:var(--indigo);font-weight:800}
-
-  /* Method stages */
-  .stages{counter-reset:st;display:flex;flex-direction:column;gap:10px;margin-top:16px}
-  .stage{
-    display:flex;gap:14px;align-items:flex-start;
-    background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:14px 16px;
-    transition:.2s;
-  }
-  .stage:hover{background:#eef2ff;border-color:#c7d2fe}
-  .stage::before{
-    counter-increment:st;content:counter(st);
-    width:30px;height:30px;flex:0 0 30px;border-radius:9px;
-    background:linear-gradient(135deg,var(--indigo),var(--indigo-d));
-    color:#fff;font-weight:800;font-size:14px;display:grid;place-items:center;
-  }
-  .stage .s-body{font-size:14px}
-  .stage .s-body strong{color:var(--indigo-d)}
-
-  /* Roadmap output */
-  .roadmap{
-    background:linear-gradient(135deg,#1e1b4b,#0f172a);
-    color:#e2e8f0;border-radius:20px;padding:28px;margin-top:20px;
-  }
-  .roadmap h3{color:#a5b4fc;font-size:20px;margin-bottom:16px}
-  .roadmap .r-item{
-    display:flex;gap:12px;padding:12px 0;border-bottom:1px solid rgba(148,163,184,.2);
-    font-size:14px;
-  }
-  .roadmap .r-item:last-child{border-bottom:none}
-  .roadmap .r-num{
+  .option:hover:not(:disabled){transform:translateY(-2px);border-color:var(--indigo);box-shadow:0 8px 18px -12px rgba(79,70,229,.6)}
+  .option .letter{
     width:26px;height:26px;flex:0 0 26px;border-radius:8px;
-    background:#4f46e5;color:#fff;display:grid;place-items:center;font-weight:800;font-size:12px;
+    background:#f1f5f9;color:#94a3b8;display:grid;place-items:center;
+    font-size:12px;font-weight:800;transition:.2s;
   }
-  .roadmap .r-text strong{color:#fbbf24}
+  .option.correct{border-color:var(--green);background:#f0fdf4;color:#14532d}
+  .option.correct .letter{background:var(--green);color:#fff}
+  .option.wrong{border-color:var(--red);background:#fef2f2;color:#7f1d1d}
+  .option.wrong .letter{background:var(--red);color:#fff}
+  .option:disabled{cursor:default}
+
+  /* Multi-check */
+  .option.check .box{
+    width:22px;height:22px;flex:0 0 22px;border-radius:7px;
+    border:2px solid #cbd5e1;position:relative;transition:.15s;
+  }
+  .option.check.selected{border-color:var(--indigo);background:#eef2ff}
+  .option.check.selected .box{background:var(--indigo);border-color:var(--indigo)}
+  .option.check.selected .box::after{
+    content:"✓";position:absolute;inset:0;display:grid;place-items:center;
+    color:#fff;font-size:12px;font-weight:800;
+  }
+
+  /* TF row */
+  .tf-row{display:flex;gap:12px}
+  .tf-row .option{justify-content:center;font-size:16px;padding:16px 10px}
+  .tf-emoji{font-size:19px}
+
+  /* Feedback */
+  .feedback{
+    margin-top:14px;padding:14px 16px;border-radius:14px;border-left:5px solid var(--indigo);
+    background:#f8fafc;animation:fade .3s ease;font-size:14px;
+  }
+  .feedback.ok{background:#f0fdf4;border-left-color:var(--green)}
+  .feedback.bad{background:#fef2f2;border-left-color:var(--red)}
+  .fb-head{font-size:16px;font-weight:900;margin-bottom:5px}
+  .feedback.ok .fb-head{color:#15803d}
+  .feedback.bad .fb-head{color:#b91c1c}
+  .fb-expl{line-height:1.55;color:#475569;margin-bottom:10px}
+  .fb-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+  .fb-points{font-size:14px;font-weight:900;color:var(--indigo-d)}
 
   /* Buttons */
   .btn{
     font:inherit;font-size:15px;font-weight:800;cursor:pointer;
-    border:none;border-radius:14px;padding:13px 26px;
+    border:none;border-radius:14px;padding:13px 24px;
     color:#fff;background:linear-gradient(135deg,var(--indigo),var(--indigo-d));
     box-shadow:0 10px 22px -10px rgba(79,70,229,.8);
     transition:.18s;display:inline-flex;align-items:center;gap:8px;
@@ -180,538 +172,681 @@
   .btn.teal{background:linear-gradient(135deg,var(--teal),#0f766e);box-shadow:0 10px 22px -10px rgba(13,148,136,.8)}
   .btn.ghost{background:#fff;color:var(--indigo);border:2px solid #c7d2fe;box-shadow:none}
   .btn.ghost:hover{background:#eef2ff;box-shadow:none}
-  .btn-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px}
+  .btn-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:18px}
 
-  /* Progress bar */
-  .pbar{height:8px;background:#e2e8f0;border-radius:99px;overflow:hidden;margin-bottom:22px}
-  .pbar-fill{height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--indigo),var(--teal));transition:width .5s cubic-bezier(.4,0,.2,1)}
+  /* Level intro */
+  .level-hero{text-align:center;padding:10px 0}
+  .level-hero .lh-ico{font-size:64px;line-height:1;margin-bottom:12px;animation:bounce 2.2s ease-in-out infinite}
+  @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+  .level-hero h2{justify-content:center;font-size:24px;margin-bottom:8px}
+  .level-hero p{color:var(--muted);font-size:14.5px;max-width:520px;margin:0 auto 16px}
 
-  /* Reflection */
-  .reflect{display:flex;flex-direction:column;gap:14px;margin-top:14px}
-  .reflect-item label{display:block;font-size:13.5px;font-weight:800;margin-bottom:6px;color:#334155}
-  .reflect-item textarea{
-    width:100%;font:inherit;font-size:14px;padding:12px 14px;
-    border-radius:12px;border:1.5px solid var(--line);resize:vertical;min-height:70px;
-    transition:.2s;
+  /* Result */
+  .result-emoji{font-size:64px;line-height:1;margin-bottom:10px}
+  .result-title{
+    font-size:24px;margin-bottom:6px;
+    background:linear-gradient(120deg,var(--indigo),var(--teal));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
   }
-  .reflect-item textarea:focus{outline:none;border-color:var(--indigo);box-shadow:0 0 0 4px rgba(79,70,229,.12)}
+  .result-score{font-size:14px;font-weight:700;color:var(--muted);margin-bottom:4px}
+  .score-big{font-size:42px;font-weight:900;color:var(--indigo-d);line-height:1;margin-bottom:14px;font-variant-numeric:tabular-nums}
 
-  /* Utility */
-  .hidden{display:none !important}
-  .tag{
-    display:inline-block;font-size:11px;font-weight:800;padding:4px 10px;border-radius:99px;
-    background:#e0e7ff;color:var(--indigo);margin-right:6px;margin-bottom:6px;
+  /* Diploma */
+  #diploma{
+    position:relative;max-width:720px;margin:0 auto;
+    background:#fffdf7;color:#3a2a20;
+    border:3px solid #c9a227;border-radius:16px;
+    padding:30px 26px 20px;text-align:center;
+    font-family:Georgia,'Times New Roman',serif;
+    box-shadow:0 30px 60px -30px rgba(120,80,20,.55),0 0 0 8px #fffdf7,0 0 0 10px #e8cf8a;
   }
-  .tag.teal{background:#ccfbf1;color:#0f766e}
-  .tag.amber{background:#fef3c7;color:#92400e}
+  #diploma::before{content:"";position:absolute;inset:10px;border:1px solid #e3cd93;border-radius:10px;pointer-events:none}
+  .dip-corner{position:absolute;font-size:18px;opacity:.4}
+  .dip-corner.tl{top:12px;left:16px}.dip-corner.tr{top:12px;right:16px}
+  .dip-corner.bl{bottom:12px;left:16px}.dip-corner.br{bottom:12px;right:16px}
+  .dip-academy{font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:#8a6d1f;margin-bottom:4px}
+  .dip-title{font-size:40px;letter-spacing:.14em;color:#a8741a;font-weight:700;line-height:1.1}
+  .dip-sub{font-style:italic;font-size:13.5px;color:#7b6a5a;margin-top:4px}
+  .dip-name{
+    display:inline-block;font-family:'Segoe Script','Brush Script MT',cursive;
+    font-size:32px;color:#6b3fa0;margin:12px 0 6px;padding:0 16px 4px;
+    border-bottom:1px dashed #d9c69a;line-height:1.25;
+  }
+  .dip-text{font-size:14px;line-height:1.6;color:#4b3a2e}
+  .dip-rank{
+    display:inline-block;margin:12px auto 4px;padding:7px 20px;border-radius:99px;
+    background:linear-gradient(135deg,#fff3d6,#ffe1a8);border:1px solid #e3c37a;
+    font-size:16px;font-weight:700;color:#8a5a00;
+  }
+  .dip-stats{display:flex;justify-content:center;gap:24px;margin:14px 0 6px;flex-wrap:wrap}
+  .dip-stats div span{display:block;font-family:'Segoe UI',sans-serif;font-size:22px;font-weight:800;color:#a8741a;line-height:1.1}
+  .dip-stats div small{display:block;font-family:'Segoe UI',sans-serif;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:#9a8a78;margin-top:3px}
+  .dip-footer{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:16px;font-size:12px;color:#6d5b4b;text-align:left}
+  .dip-seal{font-size:28px;line-height:1;color:#a8741a;text-align:center}
+  .dip-seal small{display:block;font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:#9a8a78;margin-top:3px}
+  .dip-sign{text-align:right}.dip-sign b{display:block;margin-top:3px;font-size:13px}
+  .dip-no{margin-top:12px;font-size:11px;letter-spacing:.08em;color:#9a8a78}
 
-  @media(max-width:640px){
-    header h1{font-size:26px}
-    .card{padding:20px 16px}
-    .scenario-inputs{grid-template-columns:1fr}
-    .triad-node{width:110px;padding:14px 8px}
+  /* Name input */
+  .name-box{max-width:360px;margin:0 auto;text-align:left}
+  .name-box label{display:block;font-size:13px;font-weight:800;color:var(--muted);margin-bottom:6px}
+  .name-box input{
+    width:100%;font:inherit;font-size:16px;font-weight:600;color:var(--ink);
+    padding:13px 15px;border-radius:12px;border:2px solid #e2e8f0;background:#fff;transition:.2s;
+  }
+  .name-box input:focus{outline:none;border-color:var(--indigo);box-shadow:0 0 0 4px rgba(79,70,229,.15)}
+  .error{color:var(--red);font-size:13px;font-weight:700;min-height:18px;margin:5px 0 2px}
+
+  .hidden{display:none!important}
+
+  /* Print */
+  @media print{
+    @page{size:A4 landscape;margin:10mm}
+    body{background:#fff;padding:0;display:block}
+    body *{visibility:hidden}
+    #diploma,#diploma *{visibility:visible}
+    #diploma{position:absolute;left:0;top:0;width:100%;margin:0;box-shadow:none;border-radius:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .no-print{display:none!important}
+  }
+
+  @media(max-width:520px){
+    header h1{font-size:23px}
+    .card{padding:18px 15px}
+    .q-text{font-size:16px}
+    .option{font-size:14px;padding:12px 12px}
+    .dip-title{font-size:30px}
+    .dip-name{font-size:26px}
+    #diploma{padding:22px 14px 16px}
+    .level-node{padding:7px 10px;font-size:12px}
   }
 </style>
 </head>
 <body>
 <div class="wrap">
-
-  <header>
-    <div class="badge-top">Технология Форсайт · Занятие</div>
+  <header class="no-print">
+    <div class="badge-top">Технология Форсайт · Квест с уровнями</div>
     <h1>Будущее образования с искусственным интеллектом</h1>
-    <p>Интерактивная форсайт-сессия на основе методики обучения письменной речи в триаде «обучающийся — преподаватель — искусственный интеллект» (Сысоев П.В., Филатов Е.М., 2024).</p>
+    <p>Пройдите 4 уровня, отвечая на вопросы по методике Сысоева и Филатова (2024). В конце — именной диплом.</p>
   </header>
 
-  <div class="steps" id="stepsBar"></div>
-  <div class="pbar"><div class="pbar-fill" id="pbarFill"></div></div>
+  <div class="level-map no-print" id="levelMap"></div>
+  <div class="pbar-wrap no-print" id="pbarWrap">
+    <div class="pbar"><div class="pbar-fill" id="pbarFill"></div></div>
+    <div class="pbar-labels">
+      <span id="pbarLevel">Уровень 1</span>
+      <span id="pbarScore">⭐ 0 очков</span>
+    </div>
+  </div>
 
-  <main id="stageArea"></main>
-
+  <main id="app"></main>
 </div>
 
 <script>
 /* =========================================================
-   ДАННЫЕ СТАДИЙ ФОРСАЙТ-СЕССИИ
+   УРОВНИ И ВОПРОСЫ
    ========================================================= */
-const STEPS = [
-  { id:'intro',      label:'Введение',        ico:'📖' },
-  { id:'trends',     label:'Тренды',          ico:'📈' },
-  { id:'triad',      label:'Триада',          ico:'🔺' },
-  { id:'method',     label:'Методика',        ico:'🧩' },
-  { id:'scenario',   label:'Сценарий',        ico:'🎛️' },
-  { id:'roadmap',    label:'Дорожная карта',  ico:'🗺️' },
-  { id:'reflect',    label:'Рефлексия',       ico:'💭' }
+const LEVELS = [
+  {
+    id: 1, ico: '📖', title: 'Уровень 1. Введение в триаду',
+    desc: 'Проверьте, как вы поняли ключевую идею статьи: ИИ не заменяет преподавателя, а дополняет его.',
+    questions: [
+      {
+        type: 'single',
+        q: 'Что представляет собой триада, предлагаемая авторами статьи как новая парадигма образования?',
+        options: [
+          '«обучающийся — преподаватель — искусственный интеллект»',
+          '«обучающийся — учебник — компьютер»',
+          '«преподаватель — администрация — ИИ»',
+          '«ИИ — нейросеть — чат-бот»'
+        ],
+        correct: 0,
+        expl: 'Авторы предлагают триаду «обучающийся — преподаватель — искусственный интеллект», где ИИ — дополнительный третий субъект образовательного процесса.'
+      },
+      {
+        type: 'tf',
+        q: 'Согласно статье, искусственный интеллект полностью заменяет преподавателя в процессе обучения.',
+        correct: false,
+        expl: 'Нет. Преподаватель не исключается из процесса: традиционная методика обогащается дополнительными этапами взаимодействия с ИИ.'
+      },
+      {
+        type: 'single',
+        q: 'Какие две новые для практики преподавания аспекта особо выделяют авторы?',
+        options: [
+          'Скорость интернета и мощность компьютеров',
+          'Соблюдение авторской этики и обсуждение результатов взаимодействия с ИИ в аудитории',
+          'Запрет ИИ и возврат к бумажным работам',
+          'Использование только Grammarly'
+        ],
+        correct: 1,
+        expl: 'Авторы акцентируют: а) соблюдение норм авторской этики при получении обратной связи от ИИ; б) необходимость обсуждения результатов взаимодействия с ИИ во время аудиторных занятий.'
+      }
+    ]
+  },
+  {
+    id: 2, ico: '🎛️', title: 'Уровень 2. Роли и этика',
+    desc: 'Разберитесь, какие функции берёт на себя ИИ и что остаётся за преподавателем и обучающимся.',
+    questions: [
+      {
+        type: 'multi',
+        q: 'Какие преимущества интеграции ИИ в обучение письменной речи выделяют авторы?',
+        options: [
+          'Снижение страха обучающихся совершить ошибку перед преподавателем',
+          'Мгновенная проверка письменных творческих работ',
+          'Предоставление количественной и качественной обратной связи',
+          'Полная отмена необходимости учиться писать самостоятельно'
+        ],
+        correct: [0, 1, 2],
+        expl: 'Авторы называют три преимущества: снижение страха ошибки, мгновенная проверка и обратная связь (баллы + комментарии). Отмену самостоятельного письма они не предлагают.'
+      },
+      {
+        type: 'single',
+        q: 'Какая проблема в академической среде связана с использованием ИИ и вызывает особую тревогу?',
+        options: [
+          'Слишком высокая стоимость ИИ-инструментов',
+          'Несоблюдение обучающимися норм авторской этики (плагиат, выдача сгенерированных текстов за свои)',
+          'Отсутствие интернета в аудиториях',
+          'Слишком медленная работа ChatGPT'
+        ],
+        correct: 1,
+        expl: 'Ключевая проблема — авторская этика: обучающиеся могут выдавать сгенерированные ИИ тексты за свои. Авторы предлагают не запрет, а обучение разумному использованию ИИ.'
+      },
+      {
+        type: 'tf',
+        q: 'Авторы считают, что запрет на использование ИИ в образовательном процессе решает проблему плагиата.',
+        correct: false,
+        expl: 'Нет. Авторы прямо пишут: запрет «не ведёт к решению проблемы, а где-то усугубляет её». Решение — в создании комплексной методики с этапами анализа ИИ-эссе.'
+      }
+    ]
+  },
+  {
+    id: 3, ico: '🧩', title: 'Уровень 3. 11 этапов методики',
+    desc: 'Проверьте знание последовательности обучения письму в триаде «обучающийся — преподаватель — ИИ».',
+    questions: [
+      {
+        type: 'single',
+        q: 'Чем посвящён второй этап методики?',
+        options: [
+          'Написанием финального эссе',
+          'Погружением обучающихся в проектную деятельность по использованию конкретного ИИ-инструмента',
+          'Рефлексией',
+          'Печатью диплома'
+        ],
+        correct: 1,
+        expl: 'Второй этап — погружение в проект: преподаватель объясняет цель, этапы работы, ожидаемый результат и критерии оценки.'
+      },
+      {
+        type: 'multi',
+        q: 'Что происходит на шестом и девятом этапах (аудиторная работа)?',
+        options: [
+          'Анализ и обсуждение сгенерированных ИИ работ в малых группах',
+          'Обсуждение, какие изменения предложил ИИ и почему',
+          'Аргументация использования или неиспользования рекомендаций ИИ',
+          'Полный запрет ИИ'
+        ],
+        correct: [0, 1, 2],
+        expl: 'Шестой этап — анализ и обсуждение сгенерированных ИИ эссе. Девятый — обсуждение рекомендаций ИИ и аргументация их использования. Запрет ИИ методика не предполагает.'
+      },
+      {
+        type: 'tf',
+        q: 'Аудиторная работа с обратной связью от ИИ (этапы 6 и 9) служит контролем самостоятельного внеаудиторного взаимодействия с ИИ (этапы 5 и 8).',
+        correct: true,
+        expl: 'Верно. Авторы подчёркивают: аудиторная работа с обратной связью — это контроль и подтверждение самостоятельного внеаудиторного взаимодействия обучающихся с ИИ.'
+      },
+      {
+        type: 'single',
+        q: 'На каком этапе обучающиеся пишут собственное эссе с учётом опыта взаимодействия с ИИ?',
+        options: ['На третьем', 'На пятом', 'На седьмом', 'На одиннадцатом'],
+        correct: 2,
+        expl: 'Седьмой этап — написание обучающимися собственного эссе по теме с учётом опыта взаимодействия с ИИ.'
+      }
+    ]
+  },
+  {
+    id: 4, ico: '🚀', title: 'Уровень 4. Будущее и выводы',
+    desc: 'Финальный уровень: осмыслите перспективы и главные выводы статьи.',
+    questions: [
+      {
+        type: 'single',
+        q: 'Какой ИИ-инструмент авторы называют наиболее совершенным для предоставления качественной обратной связи?',
+        options: ['Grammarly', 'PaperRater', 'ChatGPT', 'Google Translate'],
+        correct: 2,
+        expl: 'Авторы отмечают: из всех доступных ИИ-инструментов ChatGPT от OpenAI — наиболее совершенный, способный давать обратную связь по широкому спектру критериев, включая содержание.'
+      },
+      {
+        type: 'tf',
+        q: 'По мнению авторов, ИИ уже полностью и безошибочно оценивает глубину содержания письменных работ.',
+        correct: false,
+        expl: 'Нет. Содержание — единственный критерий, вызывающий дискуссии: критики считают, что ИИ оценивает содержание лишь по формальным признакам (разнообразие лексики, когезия).'
+      },
+      {
+        type: 'multi',
+        q: 'Какие выводы о будущем образования с ИИ соответствуют статье?',
+        options: [
+          'Триада обогащает традиционную методику новыми возможностями',
+          'Преподаватель сохраняет функции обучения и оценки',
+          'Необходимо обсуждать результаты взаимодействия с ИИ в аудитории',
+          'ИИ должен полностью заменить преподавателя'
+        ],
+        correct: [0, 1, 2],
+        expl: 'Авторы подчёркивают: триада обогащает методику, преподаватель сохраняет функции, аудиторное обсуждение обязательно. Полной замены преподавателя ИИ не предполагается.'
+      },
+      {
+        type: 'single',
+        q: 'В чём главная идея статьи о роли ИИ в образовании?',
+        options: [
+          'ИИ должен быть запрещён в школах и вузах',
+          'ИИ дополняет преподавателя, а не заменяет его, в рамках триады',
+          'ИИ нужен только для перевода текстов',
+          'ИИ полностью заменит все учебники'
+        ],
+        correct: 1,
+        expl: 'Главная идея: ИИ встраивается в традиционную методику как дополнительный субъект триады, обогащая процесс, но не заменяя преподавателя.'
+      }
+    ]
+  }
 ];
 
+/* =========================================================
+   СОСТОЯНИЕ
+   ========================================================= */
 const state = {
-  step: 0,
-  selectedTrends: new Set(),
-  scenario: { horizon:'2030', aiRole:'', teacherRole:'', risk:'' },
-  reflection: { what:'', how:'', risk:'' }
+  name: '',
+  level: 0,          // индекс текущего уровня
+  qIndex: 0,         // индекс вопроса внутри уровня
+  score: 0,
+  totalCorrect: 0,
+  totalQuestions: 0,
+  unlocked: new Set([0]),
+  completed: new Set(),
+  locked: false
 };
 
-const area = document.getElementById('stageArea');
-const stepsBar = document.getElementById('stepsBar');
+const app = document.getElementById('app');
+const levelMap = document.getElementById('levelMap');
 const pbarFill = document.getElementById('pbarFill');
+const pbarLevel = document.getElementById('pbarLevel');
+const pbarScore = document.getElementById('pbarScore');
+const pbarWrap = document.getElementById('pbarWrap');
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 /* =========================================================
-   ОТРИСОВКА ИНДИКАТОРА ШАГОВ
+   КАРТА УРОВНЕЙ
    ========================================================= */
-function renderSteps(){
-  stepsBar.innerHTML = STEPS.map((s, i) => {
-    let cls = 'step-dot';
-    if (i === state.step) cls += ' active';
-    else if (i < state.step) cls += ' done';
-    const num = i < state.step ? '✓' : (i + 1);
-    return `<div class="${cls}"><span class="num">${num}</span>${s.ico} ${s.label}</div>`;
+function renderLevelMap(){
+  levelMap.innerHTML = LEVELS.map((lv, i) => {
+    let cls = 'level-node';
+    if (i === state.level) cls += ' active';
+    else if (state.completed.has(i)) cls += ' done';
+    else if (!state.unlocked.has(i)) cls += ' locked';
+    const num = state.completed.has(i) ? '✓' : (i + 1);
+    return `<div class="${cls}"><span class="ln-ico">${lv.ico}</span><span class="ln-num">${num}</span>${lv.title.split('.')[0]}</div>`;
   }).join('');
-  const pct = ((state.step) / (STEPS.length - 1)) * 100;
+}
+
+function updateProgress(){
+  const totalQ = LEVELS.reduce((s, l) => s + l.questions.length, 0);
+  const doneQ = LEVELS.slice(0, state.level).reduce((s, l) => s + l.questions.length, 0) + state.qIndex;
+  const pct = (doneQ / totalQ) * 100;
   pbarFill.style.width = pct + '%';
+  pbarLevel.textContent = 'Уровень ' + (state.level + 1) + ' из ' + LEVELS.length;
+  pbarScore.textContent = '⭐ ' + state.score + ' очков';
 }
 
 /* =========================================================
-   ПЕРЕХОД МЕЖДУ СТАДИЯМИ
+   СТАРТ
    ========================================================= */
-function goTo(idx){
-  state.step = idx;
-  renderSteps();
-  renderStage();
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-/* =========================================================
-   РЕНДЕР СТАДИИ
-   ========================================================= */
-function renderStage(){
-  const id = STEPS[state.step].id;
-  if (id === 'intro')    return renderIntro();
-  if (id === 'trends')   return renderTrends();
-  if (id === 'triad')    return renderTriad();
-  if (id === 'method')   return renderMethod();
-  if (id === 'scenario') return renderScenario();
-  if (id === 'roadmap')  return renderRoadmap();
-  if (id === 'reflect')  return renderReflect();
-}
-
-/* =========================================================
-   1. ВВЕДЕНИЕ — СТАТЬЯ
-   ========================================================= */
-function renderIntro(){
-  area.innerHTML = `
-    <div class="card">
-      <h2><span class="ico">📖</span> Введение: почему это важно</h2>
-      <p class="sub">Форсайт-сессия опирается на исследование П.В. Сысоева и Е.М. Филатова (2024) о методике обучения письменной речи в триаде «обучающийся — преподаватель — искусственный интеллект».</p>
-
-      <div class="article-box">
-        <div class="label">Из статьи · Аннотация</div>
-        <p>Интеграция технологий искусственного интеллекта (ИИ) в систему образования позволяет значительно обогатить иноязычную практику обучающихся. Вместе с тем постепенное внедрение ИИ-инструментов может вызывать опасения педагогов, связанные с исключением преподавателя из процесса обучения.</p>
-        <p>В качестве современной парадигмы образования авторы предлагают триаду <strong>«обучающийся — преподаватель — искусственный интеллект»</strong>, в рамках которой взаимодействие обучающихся с ИИ встраивается в традиционную методику обучения.</p>
-      </div>
-
-      <div class="article-box" style="border-left-color:var(--teal);background:#f0fdfa">
-        <div class="label" style="color:var(--teal)">Ключевые тезисы статьи</div>
-        <p><strong>1.</strong> Обучению письменной речи часто уделяется мало времени из-за трудоёмкости проверки работ.</p>
-        <p><strong>2.</strong> ИИ способен взять на себя оценку письменных работ и предоставление обратной связи.</p>
-        <p><strong>3.</strong> Преподаватель <strong>не исключается</strong> из процесса — он обогащает традиционную методику.</p>
-        <p><strong>4.</strong> Особое внимание — соблюдению норм авторской этики и обсуждению результатов взаимодействия с ИИ в аудитории.</p>
-      </div>
-
-      <div class="quote">
-        «Преподаватель не исключается из процесса обучения учащихся или студентов иностранному языку и оценки их письменных работ. Традиционная методика обогащается дополнительными этапами по взаимодействию с ИИ».
-      </div>
-
-      <p style="font-size:14px;color:var(--muted);margin-top:14px">
-        <span class="tag">ИИ в образовании</span>
-        <span class="tag teal">Триада</span>
-        <span class="tag amber">Авторская этика</span>
-        <span class="tag">Обратная связь</span>
-      </p>
-
-      <div class="btn-row">
-        <button class="btn" id="nextBtn">Начать форсайт →</button>
-      </div>
-    </div>
-  `;
-  document.getElementById('nextBtn').addEventListener('click', () => goTo(1));
-}
-
-/* =========================================================
-   2. ТРЕНДЫ
-   ========================================================= */
-const TRENDS = [
-  { ico:'🤖', title:'ИИ как третий субъект обучения', desc:'ИИ становится равноправным участником образовательного процесса наряду с обучающимся и преподавателем.' },
-  { ico:'✍️', title:'Автоматическая обратная связь', desc:'ИИ-инструменты (ChatGPT, Grammarly) дают мгновенную оценку и рекомендации по доработке работ.' },
-  { ico:'🎓', title:'Смешанное обучение', desc:'Часть этапов — внеаудиторно с ИИ, часть — аудиторно с преподавателем и обсуждением в группах.' },
-  { ico:'⚖️', title:'Авторская этика', desc:'Риск плагиата и генерации текстов ИИ за своих — ключевой вызов для академической среды.' },
-  { ico:'🧠', title:'Критическое мышление', desc:'Анализ и оценка сгенерированных ИИ текстов развивают критическое отношение к информации.' },
-  { ico:'📊', title:'Оценка содержания', desc:'Главный спор: способен ли ИИ оценить глубину содержания, а не только форму и лексику.' },
-  { ico:'🌐', title:'Доступность', desc:'ИИ-инструменты снижают барьеры и дают обратную связь там, где не хватает преподавательских часов.' },
-  { ico:'🏫', title:'Новая роль преподавателя', desc:'От проверяющего — к фасилитатору обсуждения и наставнику по работе с ИИ.' }
-];
-
-function renderTrends(){
-  area.innerHTML = `
-    <div class="card">
-      <h2><span class="ico">📈</span> Шаг 1. Карта трендов</h2>
-      <p class="sub">Выберите 3–4 тренда, которые, по вашему мнению, сильнее всего повлияют на будущее образования с ИИ. Нажмите на карточку, чтобы отметить.</p>
-      <div class="grid" id="trendGrid">
-        ${TRENDS.map((t, i) => `
-          <div class="trend" data-i="${i}">
-            <div class="t-ico">${t.ico}</div>
-            <div class="t-title">${t.title}</div>
-            <div class="t-desc">${t.desc}</div>
-          </div>
-        `).join('')}
-      </div>
-      <div class="btn-row">
-        <button class="btn ghost" id="backBtn">← Назад</button>
-        <button class="btn" id="nextBtn" disabled>Далее →</button>
-      </div>
-    </div>
-  `;
-
-  const grid = document.getElementById('trendGrid');
-  const nextBtn = document.getElementById('nextBtn');
-
-  grid.querySelectorAll('.trend').forEach(el => {
-    el.addEventListener('click', () => {
-      const i = Number(el.dataset.i);
-      if (state.selectedTrends.has(i)) {
-        state.selectedTrends.delete(i);
-        el.style.borderColor = '';
-        el.style.background = '';
-      } else {
-        state.selectedTrends.add(i);
-        el.style.borderColor = 'var(--indigo)';
-        el.style.background = '#eef2ff';
-      }
-      nextBtn.disabled = state.selectedTrends.size < 2;
-    });
-  });
-
-  document.getElementById('backBtn').addEventListener('click', () => goTo(0));
-  nextBtn.addEventListener('click', () => goTo(2));
-}
-
-/* =========================================================
-   3. ТРИАДА
-   ========================================================= */
-function renderTriad(){
-  area.innerHTML = `
-    <div class="card">
-      <h2><span class="ico">🔺</span> Шаг 2. Триада «обучающийся — преподаватель — ИИ»</h2>
-      <p class="sub">Ключевая идея статьи: ИИ не заменяет преподавателя, а дополняет его. Рассмотрите роли каждого участника.</p>
-
-      <div class="triad">
-        <div class="triad-node">
-          <div class="n-ico">🧑‍🎓</div>
-          <div class="n-name">Обучающийся</div>
-          <div class="n-role">Пишет, анализирует, рефлексирует</div>
-        </div>
-        <div class="triad-arrow">⇄</div>
-        <div class="triad-node">
-          <div class="n-ico">👩‍🏫</div>
-          <div class="n-name">Преподаватель</div>
-          <div class="n-role">Обучает, фасилитирует, оценивает</div>
-        </div>
-        <div class="triad-arrow">⇄</div>
-        <div class="triad-node">
-          <div class="n-ico">🤖</div>
-          <div class="n-name">Искусственный интеллект</div>
-          <div class="n-role">Генерирует, оценивает, рекомендует</div>
-        </div>
-      </div>
-
-      <div class="article-box">
-        <div class="label">Из статьи · О роли преподавателя</div>
-        <p>«Преподаватель не исключается из процесса обучения… Традиционная методика обучения письменной речи обогащается дополнительными этапами по взаимодействию с ИИ, создавая дополнительные условия для обучающихся развивать необходимые иноязычные речевые умения».</p>
-      </div>
-
-      <div class="article-box" style="border-left-color:var(--teal);background:#f0fdfa">
-        <div class="label" style="color:var(--teal)">Новые акценты методики</div>
-        <p><strong>а)</strong> Соблюдение обучающимися норм авторской этики при получении обратной связи от ИИ.</p>
-        <p><strong>б)</strong> Необходимость обсуждения во время аудиторных занятий результатов взаимодействия обучающихся с ИИ.</p>
-      </div>
-
-      <div class="btn-row">
-        <button class="btn ghost" id="backBtn">← Назад</button>
-        <button class="btn" id="nextBtn">К методике →</button>
-      </div>
-    </div>
-  `;
-  document.getElementById('backBtn').addEventListener('click', () => goTo(1));
-  document.getElementById('nextBtn').addEventListener('click', () => goTo(3));
-}
-
-/* =========================================================
-   4. МЕТОДИКА — 11 ЭТАПОВ
-   ========================================================= */
-const STAGES = [
-  { t:'Предварительный этап', d:'Овладение организационной структурой эссе: введение, основная часть, заключение, аргументация, когезия и когерентность. <strong>Традиционная методика.</strong>' },
-  { t:'Погружение в проект', d:'Преподаватель объясняет цель проекта, этапы работы, ожидаемый результат и критерии оценки использования ИИ-инструмента.' },
-  { t:'Обучение промптам', d:'Преподаватель объясняет, как формулировать запросы (промпты) к ИИ для получения ожидаемой обратной связи.' },
-  { t:'Авторская этика', d:'Обсуждение правил соблюдения норм авторской этики при взаимодействии с ИИ. В какой степени и с какой целью использовать обратную связь от ИИ.' },
-  { t:'Взаимодействие с ИИ', d:'Обучающиеся получают от ИИ готовый вариант эссе по заданной теме (внеаудиторно).' },
-  { t:'Анализ в малых группах', d:'В классе обучающиеся критически анализируют и обсуждают сгенерированные ИИ работы, «защищают» их, выделяя плюсы и минусы.' },
-  { t:'Собственное эссе', d:'Обучающиеся пишут собственное эссе по теме с учётом опыта взаимодействия с ИИ.' },
-  { t:'Обратная связь от ИИ', d:'Обучающиеся получают комментарии и рекомендации от ИИ по доработке собственных эссе.' },
-  { t:'Обсуждение рекомендаций', d:'В малых группах обсуждают, какие изменения предложил ИИ и почему; аргументируют использование или неиспользование рекомендаций.' },
-  { t:'Финальная версия', d:'Доработка письменной работы и подготовка финальной версии для оценки преподавателем.' },
-  { t:'Рефлексия', d:'Обучающиеся оценивают своё участие в проекте и проводят рефлексию взаимодействия с ИИ-инструментом.' }
-];
-
-function renderMethod(){
-  area.innerHTML = `
-    <div class="card">
-      <h2><span class="ico">🧩</span> Шаг 3. 11 этапов методики</h2>
-      <p class="sub">Последовательность обучения написанию эссе в триаде «обучающийся — преподаватель — ИИ» (по статье Сысоева и Филатова, 2024).</p>
-      <div class="stages">
-        ${STAGES.map(s => `
-          <div class="stage">
-            <div class="s-body"><strong>${s.t}.</strong> ${s.d}</div>
-          </div>
-        `).join('')}
-      </div>
-      <div class="article-box" style="margin-top:20px">
-        <div class="label">Важно из статьи</div>
-        <p>Этапы носят условный характер: в зависимости от уровня обучающихся некоторые этапы могут изменяться или исключаться. Отдельное внимание — <strong>организации аудиторной работы с обратной связью от ИИ</strong> (этапы 6 и 9) как контролю самостоятельного внеаудиторного взаимодействия (этапы 5 и 8).</p>
-      </div>
-      <div class="btn-row">
-        <button class="btn ghost" id="backBtn">← Назад</button>
-        <button class="btn" id="nextBtn">Построить сценарий →</button>
-      </div>
-    </div>
-  `;
-  document.getElementById('backBtn').addEventListener('click', () => goTo(2));
-  document.getElementById('nextBtn').addEventListener('click', () => goTo(4));
-}
-
-/* =========================================================
-   5. СЦЕНАРИЙ
-   ========================================================= */
-function renderScenario(){
-  area.innerHTML = `
-    <div class="card">
-      <h2><span class="ico">🎛️</span> Шаг 4. Построение сценария</h2>
-      <p class="sub">Сформулируйте свой сценарий будущего образования с ИИ на основе выбранных трендов и методики.</p>
-
-      <div class="scenario-inputs">
-        <div>
-          <label>Горизонт планирования</label>
-          <select id="horizon">
-            <option value="2026">2026 — ближайшее будущее</option>
-            <option value="2030" selected>2030 — среднесрочный</option>
-            <option value="2035">2035 — долгосрочный</option>
-          </select>
-        </div>
-        <div>
-          <label>Ключевой риск</label>
-          <select id="risk">
-            <option value="">— выберите —</option>
-            <option value="plagiarism">Плагиат и генерация текстов ИИ</option>
-            <option value="teacher">Исключение преподавателя</option>
-            <option value="content">Неспособность ИИ оценить содержание</option>
-            <option value="access">Неравный доступ к ИИ</option>
-          </select>
-        </div>
-      </div>
-
-      <div style="margin-top:16px">
-        <label style="display:block;font-size:13px;font-weight:800;color:var(--muted);margin-bottom:6px">Роль ИИ в вашем сценарии</label>
-        <input id="aiRole" type="text" placeholder="Например: ассистент для мгновенной обратной связи" style="width:100%;font:inherit;font-size:14px;padding:12px 14px;border-radius:12px;border:1.5px solid var(--line)">
-      </div>
-
-      <div style="margin-top:16px">
-        <label style="display:block;font-size:13px;font-weight:800;color:var(--muted);margin-bottom:6px">Роль преподавателя в вашем сценарии</label>
-        <input id="teacherRole" type="text" placeholder="Например: фасилитатор обсуждения и наставник" style="width:100%;font:inherit;font-size:14px;padding:12px 14px;border-radius:12px;border:1.5px solid var(--line)">
-      </div>
-
-      <div class="btn-row">
-        <button class="btn ghost" id="backBtn">← Назад</button>
-        <button class="btn teal" id="nextBtn">Собрать дорожную карту →</button>
-      </div>
-    </div>
-  `;
-
-  // Восстанавливаем значения
-  document.getElementById('horizon').value = state.scenario.horizon;
-  document.getElementById('risk').value = state.scenario.risk;
-  document.getElementById('aiRole').value = state.scenario.aiRole;
-  document.getElementById('teacherRole').value = state.scenario.teacherRole;
-
-  document.getElementById('backBtn').addEventListener('click', () => goTo(3));
-  document.getElementById('nextBtn').addEventListener('click', () => {
-    state.scenario.horizon = document.getElementById('horizon').value;
-    state.scenario.risk = document.getElementById('risk').value;
-    state.scenario.aiRole = document.getElementById('aiRole').value.trim();
-    state.scenario.teacherRole = document.getElementById('teacherRole').value.trim();
-    goTo(5);
-  });
-}
-
-/* =========================================================
-   6. ДОРОЖНАЯ КАРТА
-   ========================================================= */
-function renderRoadmap(){
-  const selected = [...state.selectedTrends].map(i => TRENDS[i]);
-  const riskMap = {
-    plagiarism: 'Плагиат и генерация текстов ИИ',
-    teacher: 'Исключение преподавателя',
-    content: 'Неспособность ИИ оценить содержание',
-    access: 'Неравный доступ к ИИ'
-  };
-  const riskText = riskMap[state.scenario.risk] || 'не выбран';
-  const aiRole = state.scenario.aiRole || 'ассистент обратной связи';
-  const teacherRole = state.scenario.teacherRole || 'фасилитатор и наставник';
-
-  area.innerHTML = `
-    <div class="card">
-      <h2><span class="ico">🗺️</span> Шаг 5. Дорожная карта</h2>
-      <p class="sub">Итог вашей форсайт-сессии. Ниже — синтез выбранных трендов, сценария и методики статьи.</p>
-
-      <div class="roadmap">
-        <h3>Сценарий на ${state.scenario.horizon} год</h3>
-        <div class="r-item">
-          <div class="r-num">1</div>
-          <div class="r-text"><strong>Роль ИИ:</strong> ${aiRole}</div>
-        </div>
-        <div class="r-item">
-          <div class="r-num">2</div>
-          <div class="r-text"><strong>Роль преподавателя:</strong> ${teacherRole}</div>
-        </div>
-        <div class="r-item">
-          <div class="r-num">3</div>
-          <div class="r-text"><strong>Ключевой риск:</strong> ${riskText}</div>
-        </div>
-        <div class="r-item">
-          <div class="r-num">4</div>
-          <div class="r-text"><strong>Выбранные тренды:</strong> ${selected.length ? selected.map(t => t.title).join(', ') : 'не выбраны'}</div>
-        </div>
-        <div class="r-item">
-          <div class="r-num">5</div>
-          <div class="r-text"><strong>Методика:</strong> 11 этапов обучения письму в триаде «обучающийся — преподаватель — ИИ» с аудиторным обсуждением обратной связи от ИИ (этапы 6 и 9).</div>
-        </div>
-      </div>
-
-      <div class="btn-row">
-        <button class="btn ghost" id="backBtn">← Назад</button>
-        <button class="btn" id="nextBtn">К рефлексии →</button>
-      </div>
-    </div>
-  `;
-  document.getElementById('backBtn').addEventListener('click', () => goTo(4));
-  document.getElementById('nextBtn').addEventListener('click', () => goTo(6));
-}
-
-/* =========================================================
-   7. РЕФЛЕКСИЯ
-   ========================================================= */
-function renderReflect(){
-  area.innerHTML = `
-    <div class="card">
-      <h2><span class="ico">💭</span> Шаг 6. Рефлексия</h2>
-      <p class="sub">Ответьте на вопросы — это завершающий этап форсайт-сессии (соответствует 11-му этапу методики).</p>
-
-      <div class="reflect">
-        <div class="reflect-item">
-          <label>Что нового вы узнали о роли ИИ в образовании?</label>
-          <textarea id="rWhat" placeholder="Ваш ответ..."></textarea>
-        </div>
-        <div class="reflect-item">
-          <label>Как изменилось ваше представление о роли преподавателя?</label>
-          <textarea id="rHow" placeholder="Ваш ответ..."></textarea>
-        </div>
-        <div class="reflect-item">
-          <label>Какой главный риск вы видите и как его снизить?</label>
-          <textarea id="rRisk" placeholder="Ваш ответ..."></textarea>
-        </div>
-      </div>
-
-      <div class="btn-row">
-        <button class="btn ghost" id="backBtn">← Назад</button>
-        <button class="btn teal" id="finishBtn">Завершить сессию ✓</button>
-      </div>
-    </div>
-  `;
-
-  document.getElementById('rWhat').value = state.reflection.what;
-  document.getElementById('rHow').value = state.reflection.how;
-  document.getElementById('rRisk').value = state.reflection.risk;
-
-  document.getElementById('backBtn').addEventListener('click', () => goTo(5));
-  document.getElementById('finishBtn').addEventListener('click', () => {
-    state.reflection.what = document.getElementById('rWhat').value.trim();
-    state.reflection.how = document.getElementById('rHow').value.trim();
-    state.reflection.risk = document.getElementById('rRisk').value.trim();
-    renderFinal();
-  });
-}
-
-/* =========================================================
-   ФИНАЛЬНЫЙ ЭКРАН
-   ========================================================= */
-function renderFinal(){
-  const selected = [...state.selectedTrends].map(i => TRENDS[i]);
-  const riskMap = {
-    plagiarism: 'Плагиат и генерация текстов ИИ',
-    teacher: 'Исключение преподавателя',
-    content: 'Неспособность ИИ оценить содержание',
-    access: 'Неравный доступ к ИИ'
-  };
-  const riskText = riskMap[state.scenario.risk] || 'не выбран';
-
-  area.innerHTML = `
+function showStart(){
+  levelMap.innerHTML = '';
+  pbarWrap.classList.add('hidden');
+  app.innerHTML = `
     <div class="card" style="text-align:center">
-      <div style="font-size:60px;margin-bottom:10px">🎓</div>
-      <h2 style="justify-content:center"><span class="ico">✨</span> Форсайт-сессия завершена!</h2>
-      <p class="sub" style="margin-bottom:24px">Вы прошли все этапы: от знакомства со статьёй до построения сценария будущего и рефлексии.</p>
-
-      <div style="text-align:left;max-width:640px;margin:0 auto">
-        <div class="article-box" style="border-left-color:var(--teal);background:#f0fdfa">
-          <div class="label" style="color:var(--teal)">Ваш итоговый сценарий</div>
-          <p><strong>Горизонт:</strong> ${state.scenario.horizon} год</p>
-          <p><strong>Роль ИИ:</strong> ${state.scenario.aiRole || 'ассистент обратной связи'}</p>
-          <p><strong>Роль преподавателя:</strong> ${state.scenario.teacherRole || 'фасилитатор и наставник'}</p>
-          <p><strong>Ключевой риск:</strong> ${riskText}</p>
-          <p><strong>Тренды:</strong> ${selected.length ? selected.map(t => t.title).join(', ') : 'не выбраны'}</p>
-        </div>
-
-        <div class="article-box" style="border-left-color:var(--amber);background:#fffbeb">
-          <div class="label" style="color:#92400e">Главный вывод статьи</div>
-          <p>ИИ не заменяет преподавателя, а дополняет его. Триада <strong>«обучающийся — преподаватель — искусственный интеллект»</strong> обогащает традиционную методику новыми возможностями для развития речевых умений.</p>
-        </div>
-
-        ${state.reflection.what || state.reflection.how || state.reflection.risk ? `
-        <div class="article-box">
-          <div class="label">Ваша рефлексия</div>
-          ${state.reflection.what ? `<p><strong>Новое:</strong> ${state.reflection.what}</p>` : ''}
-          ${state.reflection.how ? `<p><strong>Роль преподавателя:</strong> ${state.reflection.how}</p>` : ''}
-          ${state.reflection.risk ? `<p><strong>Риск и решение:</strong> ${state.reflection.risk}</p>` : ''}
-        </div>` : ''}
+      <div style="font-size:64px;line-height:1;margin-bottom:10px;animation:bounce 2.2s ease-in-out infinite">🎓</div>
+      <h2 style="justify-content:center"><span class="ico">🚀</span> Форсайт-квест с уровнями</h2>
+      <p class="sub" style="max-width:520px;margin:0 auto 18px">
+        Вас ждут <b>4 уровня</b> и <b>13 вопросов</b> по статье Сысоева и Филатова (2024).
+        Пройдите уровень, чтобы открыть следующий. В конце — именной диплом!
+      </p>
+      <div class="name-box">
+        <label for="nameInput">Как вас зовут? (имя попадёт в диплом)</label>
+        <input id="nameInput" type="text" maxlength="30" placeholder="Например, Анна" autocomplete="off">
+        <div class="error" id="nameError"></div>
+        <button class="btn" id="startBtn" style="width:100%;margin-top:6px">Начать квест 🐾</button>
       </div>
-
-      <div class="btn-row" style="justify-content:center">
-        <button class="btn ghost" id="restartBtn">🔄 Пройти заново</button>
-        <button class="btn" id="printBtn">🖨 Распечатать итог</button>
+      <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:18px">
+        <span style="font-size:12px;font-weight:700;color:#8a6a4e;background:#fff4e6;border:1px solid #f3ddc2;padding:6px 11px;border-radius:99px">📖 4 уровня</span>
+        <span style="font-size:12px;font-weight:700;color:#8a6a4e;background:#fff4e6;border:1px solid #f3ddc2;padding:6px 11px;border-radius:99px">❓ 13 вопросов</span>
+        <span style="font-size:12px;font-weight:700;color:#8a6a4e;background:#fff4e6;border:1px solid #f3ddc2;padding:6px 11px;border-radius:99px">🎓 диплом</span>
       </div>
     </div>
   `;
+  const input = document.getElementById('nameInput');
+  input.focus();
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') startGame(); });
+  document.getElementById('startBtn').addEventListener('click', startGame);
+}
 
-  document.getElementById('restartBtn').addEventListener('click', () => {
-    state.step = 0;
-    state.selectedTrends.clear();
-    state.scenario = { horizon:'2030', aiRole:'', teacherRole:'', risk:'' };
-    state.reflection = { what:'', how:'', risk:'' };
-    goTo(0);
+function startGame(){
+  const input = document.getElementById('nameInput');
+  const name = input.value.trim();
+  const err = document.getElementById('nameError');
+  if (name.length < 2){
+    err.textContent = 'Введите имя (минимум 2 символа)';
+    input.style.borderColor = 'var(--red)';
+    return;
+  }
+  state.name = name;
+  state.level = 0;
+  state.qIndex = 0;
+  state.score = 0;
+  state.totalCorrect = 0;
+  state.totalQuestions = 0;
+  state.unlocked = new Set([0]);
+  state.completed = new Set();
+  pbarWrap.classList.remove('hidden');
+  showLevelIntro();
+}
+
+/* =========================================================
+   ИНТРО УРОВНЯ
+   ========================================================= */
+function showLevelIntro(){
+  const lv = LEVELS[state.level];
+  state.qIndex = 0;
+  renderLevelMap();
+  updateProgress();
+  app.innerHTML = `
+    <div class="card level-hero">
+      <div class="lh-ico">${lv.ico}</div>
+      <h2>${lv.title}</h2>
+      <p>${lv.desc}</p>
+      <button class="btn" id="startLevelBtn">Начать уровень →</button>
+    </div>
+  `;
+  document.getElementById('startLevelBtn').addEventListener('click', showQuestion);
+}
+
+/* =========================================================
+   ВОПРОС
+   ========================================================= */
+function showQuestion(){
+  state.locked = false;
+  const lv = LEVELS[state.level];
+  const q = lv.questions[state.qIndex];
+  const n = state.qIndex + 1;
+  const total = lv.questions.length;
+
+  renderLevelMap();
+  updateProgress();
+
+  const typeLabel = {
+    single: 'Выберите один ответ',
+    multi: 'Выберите все верные варианты',
+    tf: 'Верно или неверно?'
+  }[q.type];
+
+  let inner = `
+    <div class="q-meta">
+      <span class="q-badge">Вопрос ${n} из ${total}</span>
+      <span class="q-type">${typeLabel}</span>
+    </div>
+    <h2 class="q-text">${q.q}</h2>`;
+
+  if (q.type === 'single'){
+    inner += `<div class="options">` + q.options.map((o,i) =>
+      `<button class="option" data-i="${i}">
+         <span class="letter">${'ABCD'[i]}</span><span>${o}</span>
+       </button>`).join('') + `</div>`;
+  }
+
+  if (q.type === 'multi'){
+    inner += `<div class="options">` + q.options.map((o,i) =>
+      `<button class="option check" data-i="${i}">
+         <span class="box"></span><span>${o}</span>
+       </button>`).join('') + `</div>
+      <button class="btn" id="submitBtn" disabled style="margin-top:14px">Ответить</button>`;
+  }
+
+  if (q.type === 'tf'){
+    inner += `<div class="tf-row">
+      <button class="option tf" data-v="true"><span class="tf-emoji">✅</span>Верно</button>
+      <button class="option tf" data-v="false"><span class="tf-emoji">❌</span>Неверно</button>
+    </div>`;
+  }
+
+  inner += `<div id="feedback"></div>`;
+  app.innerHTML = `<div class="card">${inner}</div>`;
+
+  /* Обработчики */
+  if (q.type === 'single'){
+    app.querySelectorAll('.option').forEach(btn => {
+      btn.addEventListener('click', () => { if (!state.locked) checkSingle(Number(btn.dataset.i)); });
+    });
+  }
+  if (q.type === 'multi'){
+    app.querySelectorAll('.option.check').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (state.locked) return;
+        btn.classList.toggle('selected');
+        document.getElementById('submitBtn').disabled =
+          app.querySelectorAll('.option.check.selected').length === 0;
+      });
+    });
+    document.getElementById('submitBtn').addEventListener('click', checkMulti);
+  }
+  if (q.type === 'tf'){
+    app.querySelectorAll('.option.tf').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (!state.locked) checkTF(btn.dataset.v === 'true');
+      });
+    });
+  }
+}
+
+/* =========================================================
+   ПРОВЕРКА
+   ========================================================= */
+function checkSingle(i){
+  const q = LEVELS[state.level].questions[state.qIndex];
+  state.locked = true;
+  app.querySelectorAll('.option').forEach((b, idx) => {
+    b.disabled = true;
+    if (idx === q.correct) b.classList.add('correct');
+    if (idx === i && i !== q.correct) b.classList.add('wrong');
   });
+  award(i === q.correct, q, i === q.correct ? 100 : 0);
+}
+
+function checkTF(val){
+  const q = LEVELS[state.level].questions[state.qIndex];
+  state.locked = true;
+  app.querySelectorAll('.option.tf').forEach(b => {
+    b.disabled = true;
+    const isTrue = b.dataset.v === 'true';
+    if (isTrue === q.correct) b.classList.add('correct');
+    if (isTrue === val && val !== q.correct) b.classList.add('wrong');
+  });
+  award(val === q.correct, q, val === q.correct ? 100 : 0);
+}
+
+function checkMulti(){
+  if (state.locked) return;
+  const q = LEVELS[state.level].questions[state.qIndex];
+  state.locked = true;
+  const selected = [...app.querySelectorAll('.option.check.selected')]
+    .map(b => Number(b.dataset.i)).sort((a,b) => a - b);
+  const correct = [...q.correct].sort((a,b) => a - b);
+  const ok = selected.length === correct.length && selected.every((v,i) => v === correct[i]);
+
+  app.querySelectorAll('.option.check').forEach((b, idx) => {
+    b.disabled = true;
+    b.classList.remove('selected');
+    if (q.correct.includes(idx)) b.classList.add('correct');
+    else if (selected.includes(idx)) b.classList.add('wrong');
+  });
+  award(ok, q, ok ? 150 : 0);
+}
+
+/* =========================================================
+   ИТОГ ВОПРОСА
+   ========================================================= */
+function award(ok, q, points){
+  if (ok) state.totalCorrect++;
+  state.totalQuestions++;
+  state.score += points;
+
+  const isLastQ = state.qIndex === LEVELS[state.level].questions.length - 1;
+  const fb = document.getElementById('feedback');
+  fb.innerHTML = `
+    <div class="feedback ${ok ? 'ok' : 'bad'}">
+      <div class="fb-head">${ok ? '✅ Верно!' : '❌ Неверно'}</div>
+      <div class="fb-expl">${q.expl}</div>
+      <div class="fb-foot">
+        <span class="fb-points">${points > 0 ? '+' + points + ' очков' : '+0 очков'}</span>
+        <button class="btn" id="nextBtn">${isLastQ ? 'Завершить уровень →' : 'Дальше →'}</button>
+      </div>
+    </div>`;
+  document.getElementById('nextBtn').addEventListener('click', () => {
+    if (isLastQ) finishLevel();
+    else { state.qIndex++; showQuestion(); }
+  });
+  fb.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+/* =========================================================
+   ЗАВЕРШЕНИЕ УРОВНЯ
+   ========================================================= */
+function finishLevel(){
+  state.completed.add(state.level);
+  const isLastLevel = state.level === LEVELS.length - 1;
+
+  if (isLastLevel){
+    showDiploma();
+    return;
+  }
+
+  const nextLevel = state.level + 1;
+  state.unlocked.add(nextLevel);
+  renderLevelMap();
+
+  app.innerHTML = `
+    <div class="card" style="text-align:center">
+      <div style="font-size:56px;margin-bottom:10px">🎉</div>
+      <h2 style="justify-content:center"><span class="ico">✅</span> Уровень пройден!</h2>
+      <p class="sub" style="margin-bottom:18px">Вы завершили уровень «${LEVELS[state.level].title}». Следующий уровень открыт!</p>
+      <div style="display:flex;justify-content:center;gap:20px;flex-wrap:wrap;margin-bottom:20px">
+        <div><div style="font-size:28px;font-weight:900;color:var(--indigo-d)">${state.score}</div><div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">очков</div></div>
+        <div><div style="font-size:28px;font-weight:900;color:var(--teal)">${state.totalCorrect}/${state.totalQuestions}</div><div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">верно</div></div>
+      </div>
+      <button class="btn" id="nextLevelBtn">Перейти на уровень ${nextLevel + 1} →</button>
+    </div>
+  `;
+  document.getElementById('nextLevelBtn').addEventListener('click', () => {
+    state.level = nextLevel;
+    showLevelIntro();
+  });
+}
+
+/* =========================================================
+   ДИПЛОМ
+   ========================================================= */
+function getRank(p){
+  if (p === 100) return { title: 'Магистр форсайта', emoji: '🎓' };
+  if (p >= 85)   return { title: 'Эксперт по ИИ в образовании', emoji: '🏆' };
+  if (p >= 70)   return { title: 'Старший аналитик', emoji: '🥇' };
+  if (p >= 55)   return { title: 'Практик форсайта', emoji: '🥈' };
+  if (p >= 40)   return { title: 'Участник сессии', emoji: '🥉' };
+  return           { title: 'Начинающий исследователь', emoji: '🐾' };
+}
+
+function showDiploma(){
+  levelMap.innerHTML = '';
+  pbarWrap.classList.add('hidden');
+
+  const totalQ = LEVELS.reduce((s, l) => s + l.questions.length, 0);
+  const pct = Math.round(state.totalCorrect / totalQ * 100);
+  const rank = getRank(pct);
+  const date = new Date().toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+  const no = 'ФС-' + Math.floor(100000 + Math.random() * 900000) + '/' + new Date().getFullYear();
+
+  app.innerHTML = `
+    <div class="card no-print" style="text-align:center">
+      <h2 style="justify-content:center"><span class="ico">🎓</span> Все уровни пройдены!</h2>
+      <p class="sub" style="margin-bottom:16px">Вот ваш именной диплом. Его можно распечатать или сохранить в PDF.</p>
+    </div>
+
+    <div id="diploma">
+      <span class="dip-corner tl">🐾</span>
+      <span class="dip-corner tr">🐾</span>
+      <span class="dip-corner bl">🐾</span>
+      <span class="dip-corner br">🐾</span>
+
+      <div class="dip-academy">Академия форсайта · Образование с ИИ</div>
+      <div class="dip-title">ДИПЛОМ</div>
+      <div class="dip-sub">о прохождении форсайт-квеста «Будущее образования с ИИ»</div>
+
+      <div class="dip-name">${esc(state.name)}</div>
+
+      <div class="dip-text">
+        успешно прошёл(ла) все 4 уровня квеста,<br>
+        верно ответив на <b>${state.totalCorrect} из ${totalQ}</b> вопросов
+      </div>
+
+      <div class="dip-rank">${rank.emoji} ${rank.title}</div>
+
+      <div class="dip-stats">
+        <div><span>${pct}%</span><small>результат</small></div>
+        <div><span>${state.score}</span><small>очков</small></div>
+        <div><span>${state.totalCorrect}/${totalQ}</span><small>верно</small></div>
+      </div>
+
+      <div class="dip-footer">
+        <div>${date}</div>
+        <div class="dip-seal">🐈<small>печать академии</small></div>
+        <div class="dip-sign">Ректор<br><b>Кот Учёный</b></div>
+      </div>
+
+      <div class="dip-no">Диплом № ${no}</div>
+    </div>
+
+    <div class="btn-row no-print" style="justify-content:center">
+      <button class="btn" id="printBtn">🖨 Распечатать / PDF</button>
+      <button class="btn ghost" id="restartBtn">🔄 Пройти заново</button>
+    </div>
+    <p class="no-print" style="text-align:center;font-size:13px;color:var(--muted);margin-top:10px">Совет: в окне печати выберите «Сохранить как PDF».</p>
+  `;
+
   document.getElementById('printBtn').addEventListener('click', () => window.print());
+  document.getElementById('restartBtn').addEventListener('click', showStart);
+
+  if (pct >= 60) confetti(36);
+}
+
+/* =========================================================
+   КОНФЕТТИ
+   ========================================================= */
+function confetti(count){
+  const emojis = ['🎓','⭐','✨','🏆','💡','📚'];
+  for (let i = 0; i < count; i++){
+    const el = document.createElement('div');
+    el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    el.style.cssText = `
+      position:fixed;left:${Math.random()*100}vw;top:-50px;
+      font-size:${16+Math.random()*22}px;pointer-events:none;z-index:9999;
+      transition:transform ${1.8+Math.random()*1.6}s linear,opacity 2.6s ease;
+    `;
+    document.body.appendChild(el);
+    requestAnimationFrame(() => {
+      el.style.transform = `translateY(${window.innerHeight+140}px) rotate(${Math.random()*720-360}deg)`;
+      el.style.opacity = '0';
+    });
+    setTimeout(() => el.remove(), 3600);
+  }
 }
 
 /* =========================================================
    ЗАПУСК
    ========================================================= */
-renderSteps();
-renderStage();
+showStart();
 </script>
 </body>
 </html>
