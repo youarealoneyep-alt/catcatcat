@@ -1,730 +1,527 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🔥 Квест-комната: Пожар на 5-м этаже</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Collocation Trainer</title>
 <style>
+  *{box-sizing:border-box}
   :root{
-    --ink:#1e293b; --muted:#64748b; --line:#e2e8f0;
-    --green:#16a34a; --red:#dc2626; --amber:#f59e0b;
-    --indigo:#4f46e5; --indigo-d:#4338ca;
-    --fire:#ef4444; --fire-d:#b91c1c;
-    --dark:#0f172a; --card:#ffffff;
+    --accent:#8b5cf6; --accent2:#22d3ee; --good:#34d399; --bad:#fb7185;
+    --text:#eef0ff; --muted:#a3a7cc;
+    --card:rgba(255,255,255,.055); --stroke:rgba(255,255,255,.11);
   }
-  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
   body{
-    font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
-    background:linear-gradient(160deg,#1e1b4b 0%,#0f172a 40%,#1c1917 100%);
-    color:#e2e8f0;min-height:100vh;padding:16px;
-    display:flex;flex-direction:column;align-items:center;
+    margin:0; padding:0; color:var(--text);
+    font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    background:
+      radial-gradient(1000px 600px at 10% -10%, rgba(139,92,246,.38), transparent 60%),
+      radial-gradient(900px 520px at 95% 0%, rgba(34,211,238,.22), transparent 55%),
+      radial-gradient(800px 600px at 50% 115%, rgba(244,114,182,.18), transparent 60%),
+      linear-gradient(160deg,#0b0a1f,#150f33 45%,#0b0a1f);
+    background-attachment:fixed;
+    min-height:100vh;
   }
-  .wrap{width:100%;max-width:1000px}
+  .app{max-width:1000px;margin:0 auto;padding:28px 18px 60px}
 
-  /* Header */
-  .top{
-    display:flex;justify-content:space-between;align-items:center;
-    background:rgba(255,255,255,.05);backdrop-filter:blur(8px);
-    border:1px solid rgba(255,255,255,.1);border-radius:16px;
-    padding:14px 20px;margin-bottom:16px;flex-wrap:wrap;gap:10px;
+  /* ---------- header ---------- */
+  header{text-align:center;margin-bottom:22px}
+  h1{
+    margin:0; font-size:clamp(1.6rem,4.4vw,2.4rem); letter-spacing:-.02em;
+    background:linear-gradient(100deg,#c4b5fd,#22d3ee 45%,#f472b6);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
   }
-  .top h1{font-size:18px;display:flex;align-items:center;gap:8px;color:#fff}
-  .top h1 span{font-size:22px}
-  .stats{display:flex;gap:10px;flex-wrap:wrap}
-  .stat{
-    background:rgba(255,255,255,.08);padding:7px 14px;border-radius:99px;
-    font-size:13px;font-weight:800;color:#cbd5e1;
-    font-variant-numeric:tabular-nums;display:flex;align-items:center;gap:6px;
-    border:1px solid rgba(255,255,255,.1);
-  }
-  .stat.timer{background:rgba(239,68,68,.2);color:#fca5a5;border-color:rgba(239,68,68,.4)}
-  .stat.timer.danger{background:var(--red);color:#fff;animation:pulse 1s infinite}
-  @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
-  .stat.good{background:rgba(22,163,74,.2);color:#86efac;border-color:rgba(22,163,74,.4)}
+  header p{margin:8px 0 0;color:var(--muted);font-size:.92rem}
 
-  /* Room Scene */
-  .room-container{
-    position:relative;
-    background:#111827;
-    border-radius:24px;
-    padding:10px;
-    box-shadow:0 0 0 3px rgba(239,68,68,.3),0 20px 60px -20px rgba(0,0,0,.7);
-    margin-bottom:16px;
-    overflow:hidden;
+  /* ---------- tabs ---------- */
+  .tabs{
+    display:flex; gap:8px; justify-content:center; flex-wrap:wrap;
+    background:rgba(255,255,255,.05); border:1px solid var(--stroke);
+    padding:6px; border-radius:16px; margin:20px auto 26px; width:fit-content;
+    backdrop-filter:blur(10px);
   }
-  .room-scene{
-    width:100%;
-    height:auto;
-    display:block;
-    border-radius:16px;
+  .tab{
+    font:inherit; font-size:.92rem; font-weight:600; color:var(--muted);
+    background:transparent; border:0; padding:10px 20px; border-radius:12px;
+    cursor:pointer; transition:.2s; white-space:nowrap;
+  }
+  .tab:hover{color:var(--text);background:rgba(255,255,255,.07)}
+  .tab.active{
+    color:#fff; background:linear-gradient(135deg,var(--accent),#6366f1);
+    box-shadow:0 8px 22px -10px rgba(139,92,246,.95);
   }
 
-  /* SVG Objects */
-  .obj-group{
-    cursor:pointer;
-    transition:filter .2s, transform .2s;
-  }
-  .obj-group:hover:not(.found){
-    filter:drop-shadow(0 0 8px rgba(251,191,36,.9));
-  }
-  .obj-group.found{
-    pointer-events:none;
-    opacity:0.3;
-    filter:grayscale(1);
-  }
-  .obj-group.wrong{
-    animation:svg-shake .4s ease;
-  }
-  @keyframes svg-shake{
-    0%,100%{transform:translateX(0)}
-    20%{transform:translateX(-5px)}
-    40%{transform:translateX(5px)}
-    60%{transform:translateX(-3px)}
-    80%{transform:translateX(3px)}
-  }
+  /* ---------- shared ---------- */
+  .panel{display:none; animation:fade .35s ease}
+  .panel.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 
-  /* Inventory */
-  .inventory{
-    background:rgba(255,255,255,.05);
-    border:1px solid rgba(255,255,255,.1);
-    border-radius:16px;padding:14px 18px;margin-bottom:16px;
-  }
-  .inv-title{font-size:12px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px}
-  .inv-slots{display:flex;gap:10px;flex-wrap:wrap}
-  .inv-slot{
-    width:56px;height:56px;border-radius:12px;
-    border:2px dashed rgba(255,255,255,.15);
-    display:grid;place-items:center;font-size:26px;
-    transition:.3s;
-  }
-  .inv-slot.filled{
-    border-style:solid;border-color:var(--green);background:rgba(22,163,74,.15);
-    animation:pop .3s ease;
-  }
-  @keyframes pop{0%{transform:scale(.5)}100%{transform:scale(1)}}
+  .toolbar{display:flex;align-items:center;gap:14px;margin-bottom:20px;flex-wrap:wrap}
+  .bar{flex:1;min-width:120px;height:8px;background:rgba(255,255,255,.09);border-radius:99px;overflow:hidden}
+  .bar>i{display:block;height:100%;width:0;border-radius:99px;
+    background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .4s ease}
+  .counter{font-size:.85rem;color:var(--muted);font-weight:600;white-space:nowrap}
 
-  /* Progress steps */
-  .steps{
-    display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;
-  }
-  .step-pill{
-    font-size:11.5px;font-weight:800;padding:6px 12px;border-radius:99px;
-    background:rgba(255,255,255,.08);color:#94a3b8;border:1px solid rgba(255,255,255,.1);
-    display:flex;align-items:center;gap:5px;
-  }
-  .step-pill.active{background:rgba(251,191,36,.2);color:#fbbf24;border-color:rgba(251,191,36,.5)}
-  .step-pill.done{background:rgba(22,163,74,.2);color:#4ade80;border-color:rgba(22,163,74,.5)}
-
-  /* Action Panel */
-  .action-panel{
-    background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
-    border-radius:16px;padding:18px;margin-top:16px;
-  }
-  .action-panel h3{font-size:16px;color:#fbbf24;margin-bottom:12px}
-  .action-options{display:flex;flex-direction:column;gap:10px}
-  .action-option{
-    background:rgba(255,255,255,.05);border:2px solid rgba(255,255,255,.1);
-    border-radius:12px;padding:14px 16px;cursor:pointer;transition:.2s;
-    font-size:14.5px;font-weight:600;color:#e2e8f0;text-align:left;
-    display:flex;align-items:center;gap:10px;
-  }
-  .action-option:hover{border-color:#fbbf24;background:rgba(251,191,36,.1)}
-  .action-option.disabled{opacity:.4;cursor:not-allowed;pointer-events:none}
-
-  /* Modal */
-  .modal-overlay{
-    position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);
-    display:none;align-items:center;justify-content:center;z-index:1000;padding:20px;
-  }
-  .modal-overlay.show{display:flex}
-  .modal{
-    background:linear-gradient(160deg,#1e293b,#0f172a);
-    border:1px solid rgba(255,255,255,.15);
-    border-radius:24px;padding:32px;max-width:520px;width:100%;
-    text-align:center;box-shadow:0 30px 60px -20px rgba(0,0,0,.8);
-    color:#e2e8f0;
-  }
-  .modal h2{font-size:24px;margin-bottom:12px;color:#fff}
-  .modal p{font-size:15px;line-height:1.6;margin-bottom:18px;color:#cbd5e1}
-  .modal .modal-emoji{font-size:64px;line-height:1;margin-bottom:16px}
-  .modal .btn-row{display:flex;gap:10px;flex-direction:column;margin-top:16px}
-  .modal .btn{width:100%}
-
-  /* Buttons */
   .btn{
-    font:inherit;font-size:15px;font-weight:800;cursor:pointer;
-    border:none;border-radius:12px;padding:13px 24px;
-    color:#fff;background:linear-gradient(135deg,var(--indigo),var(--indigo-d));
-    transition:.18s;display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    font:inherit;font-size:.88rem;font-weight:600;color:var(--text);
+    background:rgba(255,255,255,.08);border:1px solid var(--stroke);
+    padding:10px 18px;border-radius:12px;cursor:pointer;transition:.18s;
+    backdrop-filter:blur(8px);
   }
-  .btn:hover{transform:translateY(-2px);filter:brightness(1.1)}
-  .btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
-  .btn.fire{background:linear-gradient(135deg,#ef4444,#b91c1c)}
-  .btn.green{background:linear-gradient(135deg,#16a34a,#15803d)}
-  .btn.ghost{background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.2);color:#e2e8f0}
-  .btn.ghost:hover{background:rgba(255,255,255,.15)}
+  .btn:hover{background:rgba(255,255,255,.15);transform:translateY(-1px)}
+  .btn:active{transform:scale(.97)}
+  .btn.primary{
+    background:linear-gradient(135deg,var(--accent),#6366f1);border-color:transparent;
+    box-shadow:0 10px 26px -10px rgba(139,92,246,.95);
+  }
+  .btn.primary:hover{box-shadow:0 14px 32px -10px rgba(139,92,246,1)}
 
-  /* Start screen */
-  .start-card{
-    background:linear-gradient(160deg,#1e293b,#0f172a);
-    border:1px solid rgba(255,255,255,.1);
-    border-radius:24px;padding:40px 30px;text-align:center;
-    box-shadow:0 30px 60px -20px rgba(0,0,0,.7);max-width:600px;margin:0 auto;
+  /* ---------- flashcards ---------- */
+  .flip-card{perspective:1400px;height:320px;margin-bottom:22px;cursor:pointer}
+  .flip-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;
+    transition:transform .65s cubic-bezier(.4,.2,.2,1)}
+  .flip-card.flipped .flip-inner{transform:rotateY(180deg)}
+  .face{
+    position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:14px;padding:32px 26px;text-align:center;border-radius:22px;
+    border:1px solid var(--stroke);background:var(--card);backdrop-filter:blur(14px);
+    box-shadow:0 24px 60px -30px rgba(0,0,0,.9);
   }
-  .start-card .big-emoji{font-size:80px;line-height:1;margin-bottom:16px;animation:bounce 2s infinite}
-  @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
-  .start-card h2{font-size:28px;margin-bottom:12px;color:#fca5a5;line-height:1.2}
-  .start-card p{color:#94a3b8;font-size:15px;line-height:1.65;margin-bottom:16px}
-  .start-card .rules{
-    background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);
-    border-radius:14px;padding:16px;text-align:left;
-    font-size:14px;line-height:1.7;margin-bottom:22px;color:#fecaca;
-  }
-  .start-card .rules b{color:#fca5a5}
+  .front{background:linear-gradient(150deg,rgba(139,92,246,.22),rgba(255,255,255,.05))}
+  .back{transform:rotateY(180deg);background:linear-gradient(150deg,rgba(34,211,238,.18),rgba(255,255,255,.05));overflow:auto}
+  .tag{font-size:.68rem;font-weight:800;letter-spacing:.18em;color:var(--accent2);opacity:.9}
+  .face h2{margin:0;font-size:clamp(1.4rem,4vw,2.15rem);line-height:1.25;font-weight:700}
+  .face p{margin:0;font-size:clamp(1rem,2.6vw,1.18rem);line-height:1.6;color:#dfe3ff;max-width:620px}
+  .tip{font-size:.78rem;color:var(--muted)}
+  .controls{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
 
-  /* Tooltip */
-  .tooltip {
-    position: absolute;
-    background: rgba(15, 23, 42, 0.95);
-    border: 1px solid #fbbf24;
-    color: #fff;
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 700;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.2s;
-    z-index: 100;
-    white-space: nowrap;
-    transform: translate(-50%, -100%);
-    margin-top: -10px;
+  /* ---------- quiz ---------- */
+  .question{
+    background:linear-gradient(135deg,rgba(139,92,246,.18),rgba(34,211,238,.1));
+    border:1px solid rgba(255,255,255,.13);border-radius:20px;
+    padding:24px 26px;margin-bottom:20px;
   }
-  .tooltip.show { opacity: 1; }
+  .qtag{font-size:.7rem;font-weight:800;letter-spacing:.16em;color:var(--muted)}
+  .question h3{margin:10px 0 0;font-size:clamp(1.05rem,2.8vw,1.28rem);line-height:1.5;font-weight:600}
+  .option{
+    display:block;width:100%;text-align:left;font:inherit;font-size:1rem;line-height:1.45;
+    color:var(--text);background:var(--card);border:1px solid var(--stroke);
+    padding:15px 20px;border-radius:14px;margin-bottom:10px;cursor:pointer;transition:.18s;
+  }
+  .option:hover{background:rgba(255,255,255,.1);border-color:rgba(139,92,246,.65);transform:translateX(4px)}
+  .option.correct{background:rgba(52,211,153,.18);border-color:var(--good);transform:translateX(4px)}
+  .option.wrong{background:rgba(251,113,133,.16);border-color:var(--bad);animation:shake .4s}
+  @keyframes shake{
+    0%,100%{transform:translateX(4px)}
+    25%{transform:translateX(-6px)}50%{transform:translateX(6px)}75%{transform:translateX(-3px)}
+  }
 
-  @media(max-width:600px){
-    .top h1{font-size:15px}
-    .stat{font-size:11px;padding:5px 10px}
-    .start-card h2{font-size:22px}
+  .results{text-align:center;padding:26px 0 10px}
+  .score-ring{
+    width:150px;height:150px;margin:0 auto 20px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:2.1rem;font-weight:800;
+    background:radial-gradient(circle at 50% 30%,rgba(139,92,246,.35),transparent 70%),rgba(255,255,255,.06);
+    border:2px solid rgba(139,92,246,.55);
+    box-shadow:0 0 50px -10px rgba(139,92,246,.75);
   }
+  .results .msg{font-size:1.12rem;margin:0 0 26px;color:#dfe3ff}
+
+  /* ---------- match ---------- */
+  .tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  @media(max-width:640px){.tiles{grid-template-columns:1fr}}
+  .tile{
+    display:flex;align-items:center;min-height:74px;
+    background:var(--card);border:1px solid var(--stroke);border-radius:14px;
+    padding:14px 18px;font-size:.95rem;line-height:1.45;cursor:pointer;
+    transition:.18s;user-select:none;
+  }
+  .tile:hover{background:rgba(255,255,255,.1);transform:translateY(-2px)}
+  .tile.sel{
+    border-color:var(--accent2);background:rgba(34,211,238,.12);
+    box-shadow:0 0 0 2px rgba(34,211,238,.35),0 0 26px rgba(34,211,238,.28);
+  }
+  .tile.matched{
+    border-color:var(--good);background:rgba(52,211,153,.14);
+    opacity:.42;cursor:default;transform:none;
+  }
+  .tile.bad{border-color:var(--bad);background:rgba(251,113,133,.16);animation:shake .4s}
+
+  .win{
+    margin-top:18px;text-align:center;padding:22px;border-radius:18px;
+    background:linear-gradient(135deg,rgba(52,211,153,.2),rgba(34,211,238,.14));
+    border:1px solid rgba(52,211,153,.45);animation:fade .4s ease;
+  }
+  .win h4{margin:0 0 8px;font-size:1.25rem}
+  .win p{margin:0 0 16px;color:#dfe3ff}
 </style>
 </head>
 <body>
+<div class="app">
 
-<div class="wrap">
+  <header>
+    <h1>Collocation Trainer</h1>
+    <p>40 collocations · 3 game modes · tap, guess, match!</p>
+  </header>
 
-  <!-- START SCREEN -->
-  <div class="start-card" id="startScreen">
-    <div class="big-emoji">🔥</div>
-    <h2>Квест-комната:<br>Пожар на 5-м этаже</h2>
-    <p>Ты застрял в кабинете на 5-м этаже. Внизу бушует пожар, дым поднимается по лестнице. У тебя есть <b>5 минут</b>, чтобы найти нужные предметы и выбраться живым, соблюдая все правила пожарной безопасности.</p>
-    <div class="rules">
-      <b>⚠️ Правила выживания:</b><br>
-      1. Найди <b>4 предмета</b> в комнате (на столе, на полу, на полках).<br>
-      2. Не открывай дверь, не проверив её температуру.<br>
-      3. Не пользуйся лифтом.<br>
-      4. При задымлении двигайся низко и защищай дыхание.<br>
-      <b>Ошибка или истечение времени — гибель.</b>
+  <nav class="tabs">
+    <button class="tab active" data-mode="study">📚 Flashcards</button>
+    <button class="tab" data-mode="quiz">🎯 Quiz</button>
+    <button class="tab" data-mode="match">🧩 Match</button>
+  </nav>
+
+  <!-- ================= STUDY ================= -->
+  <section id="panel-study" class="panel active">
+    <div class="toolbar">
+      <div class="bar"><i id="sBar"></i></div>
+      <span class="counter" id="sCounter">1 / 40</span>
+      <button class="btn" id="sShuffle">🔀 Shuffle</button>
     </div>
-    <button class="btn fire" style="font-size:17px;padding:15px 40px" onclick="startGame()">🔥 Начать эвакуацию</button>
-  </div>
 
-  <!-- GAME SCREEN -->
-  <div id="gameScreen" style="display:none">
-
-    <!-- TOP BAR -->
-    <div class="top">
-      <h1><span>🔥</span> Эвакуация</h1>
-      <div class="stats">
-        <div class="stat timer" id="timerStat">⏱ 05:00</div>
-        <div class="stat good" id="foundStat">🔍 0 / 4</div>
+    <div class="flip-card" id="flipCard">
+      <div class="flip-inner">
+        <div class="face front">
+          <span class="tag">COLLOCATION</span>
+          <h2 id="sFront">take a photo</h2>
+          <span class="tip">tap the card to reveal the meaning</span>
+        </div>
+        <div class="face back">
+          <span class="tag">MEANING</span>
+          <p id="sBack">to use a camera to capture an image</p>
+        </div>
       </div>
     </div>
 
-    <!-- STEPS -->
-    <div class="steps">
-      <div class="step-pill active" id="step-1">1️⃣ Найти предметы</div>
-      <div class="step-pill" id="step-2">2️⃣ Проверить дверь</div>
-      <div class="step-pill" id="step-3">3️⃣ Выйти из здания</div>
+    <div class="controls">
+      <button class="btn" id="sPrev">← Prev</button>
+      <button class="btn primary" id="sFlip">Flip</button>
+      <button class="btn" id="sNext">Next →</button>
     </div>
+  </section>
 
-    <!-- ROOM (SVG) -->
-    <div class="room-container">
-      <svg class="room-scene" viewBox="0 0 1000 600" xmlns="http://www.w3.org/2000/svg">
-        <!-- Фон комнаты (стены) -->
-        <rect x="0" y="0" width="1000" height="600" fill="#1f2937"/>
-        
-        <!-- Задняя стена -->
-        <rect x="0" y="0" width="1000" height="400" fill="#374151"/>
-        <!-- Плинтус -->
-        <rect x="0" y="390" width="1000" height="10" fill="#4b5563"/>
-        
-        <!-- Пол (перспектива) -->
-        <polygon points="0,400 1000,400 1000,600 0,600" fill="#111827"/>
-        <!-- Паркет -->
-        <g stroke="#1f2937" stroke-width="2" opacity="0.5">
-          <line x1="100" y1="400" x2="0" y2="600"/>
-          <line x1="250" y1="400" x2="150" y2="600"/>
-          <line x1="400" y1="400" x2="300" y2="600"/>
-          <line x1="550" y1="400" x2="450" y2="600"/>
-          <line x1="700" y1="400" x2="600" y2="600"/>
-          <line x1="850" y1="400" x2="750" y2="600"/>
-          <line x1="1000" y1="400" x2="900" y2="600"/>
-          <line x1="0" y1="500" x2="1000" y2="500"/>
-        </g>
-
-        <!-- Окно -->
-        <rect x="700" y="100" width="200" height="250" fill="#1e3a8a" stroke="#4b5563" stroke-width="8"/>
-        <!-- Огонь за окном -->
-        <path d="M 720 350 Q 730 250 750 300 Q 760 200 780 280 Q 800 220 810 300 Q 830 250 850 320 Q 870 260 880 350 Z" fill="#ef4444" opacity="0.6"/>
-        <rect x="795" y="100" width="10" height="250" fill="#4b5563"/>
-        <rect x="700" y="215" width="200" height="10" fill="#4b5563"/>
-
-        <!-- Дверь -->
-        <rect x="100" y="150" width="120" height="250" fill="#78350f" stroke="#451a03" stroke-width="6"/>
-        <circle cx="200" cy="275" r="6" fill="#fbbf24"/>
-        <!-- Дым из-под двери -->
-        <path d="M 100 400 Q 150 380 200 400 Q 250 380 300 400" fill="none" stroke="#9ca3af" stroke-width="4" opacity="0.5"/>
-
-        <!-- Стол (перспектива) -->
-        <rect x="350" y="320" width="300" height="20" fill="#4b5563" stroke="#374151" stroke-width="2"/>
-        <rect x="370" y="340" width="15" height="100" fill="#4b5563"/>
-        <rect x="615" y="340" width="15" height="100" fill="#4b5563"/>
-        
-        <!-- Шкаф -->
-        <rect x="50" y="50" width="150" height="200" fill="#78350f" stroke="#451a03" stroke-width="4"/>
-        <rect x="60" y="60" width="60" height="180" fill="#92400e" stroke="#451a03" stroke-width="2"/>
-        <rect x="130" y="60" width="60" height="180" fill="#92400e" stroke="#451a03" stroke-width="2"/>
-
-        <!-- Картина -->
-        <rect x="450" y="80" width="100" height="80" fill="#1e293b" stroke="#4b5563" stroke-width="4"/>
-        <circle cx="500" cy="120" r="20" fill="#fbbf24" opacity="0.5"/>
-
-        <!-- Ковер на полу -->
-        <ellipse cx="500" cy="520" rx="200" ry="60" fill="#7f1d1d" opacity="0.8"/>
-        <ellipse cx="500" cy="520" rx="180" ry="50" fill="#991b1b" opacity="0.8"/>
-
-        <!-- ====== ИНТЕРАКТИВНЫЕ ОБЪЕКТЫ ====== -->
-        <!-- 1. Полотенце (на столе) -->
-        <g class="obj-group" data-id="towel" onclick="onObjectClick('towel', this)">
-          <rect x="380" y="295" width="60" height="25" fill="#f3f4f6" rx="3"/>
-          <line x1="390" y1="295" x2="390" y2="320" stroke="#d1d5db" stroke-width="2"/>
-          <line x1="410" y1="295" x2="410" y2="320" stroke="#d1d5db" stroke-width="2"/>
-          <line x1="430" y1="295" x2="430" y2="320" stroke="#d1d5db" stroke-width="2"/>
-        </g>
-
-        <!-- 2. Фонарик (на столе) -->
-        <g class="obj-group" data-id="flashlight" onclick="onObjectClick('flashlight', this)">
-          <rect x="520" y="295" width="50" height="25" fill="#fbbf24" rx="5"/>
-          <rect x="540" y="290" width="30" height="35" fill="#f59e0b" rx="5"/>
-          <circle cx="555" cy="307" r="8" fill="#fef08a"/>
-        </g>
-
-        <!-- 3. Стул (у стола) -->
-        <g class="obj-group" data-id="chair" onclick="onObjectClick('chair', this)">
-          <rect x="580" y="340" width="60" height="15" fill="#78350f" rx="3"/>
-          <rect x="590" y="355" width="10" height="60" fill="#78350f"/>
-          <rect x="620" y="355" width="10" height="60" fill="#78350f"/>
-          <rect x="595" y="340" width="10" height="60" fill="#78350f"/>
-          <rect x="615" y="340" width="10" height="60" fill="#78350f"/>
-          <rect x="580" y="300" width="60" height="40" fill="#92400e" rx="3"/>
-        </g>
-
-        <!-- 4. Дверь (уже есть, но сделаем её кликабельной) -->
-        <g class="obj-group" data-id="door" onclick="onObjectClick('door', this)">
-          <rect x="100" y="150" width="120" height="250" fill="transparent"/>
-        </g>
-
-        <!-- ====== ОТВЛЕКАЮЩИЕ ПРЕДМЕТЫ ====== -->
-        <!-- Телевизор (на полу) -->
-        <g class="obj-group" data-id="tv" onclick="onObjectClick('tv', this)">
-          <rect x="800" y="420" width="120" height="80" fill="#111827" rx="8" stroke="#374151" stroke-width="4"/>
-          <rect x="810" y="430" width="100" height="60" fill="#1e3a8a"/>
-          <circle cx="860" cy="460" r="15" fill="#fbbf24" opacity="0.3"/>
-          <rect x="840" y="500" width="40" height="10" fill="#374151"/>
-        </g>
-
-        <!-- Книги (на столе) -->
-        <g class="obj-group" data-id="book" onclick="onObjectClick('book', this)">
-          <rect x="450" y="295" width="50" height="15" fill="#b91c1c" rx="2"/>
-          <rect x="450" y="310" width="50" height="15" fill="#1d4ed8" rx="2"/>
-          <rect x="450" y="325" width="50" height="15" fill="#15803d" rx="2"/>
-        </g>
-
-        <!-- Чашка (на столе) -->
-        <g class="obj-group" data-id="cup" onclick="onObjectClick('cup', this)">
-          <ellipse cx="650" cy="315" rx="15" ry="5" fill="#78350f"/>
-          <rect x="635" y="300" width="30" height="15" fill="#f3f4f6" rx="3"/>
-          <path d="M 665 305 Q 675 305 675 310 Q 675 315 665 315" fill="none" stroke="#f3f4f6" stroke-width="4"/>
-        </g>
-
-        <!-- Цветок (на полу) -->
-        <g class="obj-group" data-id="plant" onclick="onObjectClick('plant', this)">
-          <rect x="300" y="480" width="40" height="40" fill="#78350f" rx="4"/>
-          <path d="M 320 480 Q 300 450 320 420 Q 340 450 320 480" fill="#15803d"/>
-          <path d="M 320 480 Q 340 440 360 460 Q 340 470 320 480" fill="#16a34a"/>
-        </g>
-
-        <!-- Клавиатура (на столе) -->
-        <g class="obj-group" data-id="keyboard" onclick="onObjectClick('keyboard', this)">
-          <rect x="500" y="330" width="70" height="20" fill="#374151" rx="3"/>
-          <g fill="#4b5563">
-            <rect x="505" y="333" width="8" height="6" rx="1"/>
-            <rect x="515" y="333" width="8" height="6" rx="1"/>
-            <rect x="525" y="333" width="8" height="6" rx="1"/>
-            <rect x="535" y="333" width="8" height="6" rx="1"/>
-            <rect x="545" y="333" width="8" height="6" rx="1"/>
-            <rect x="555" y="333" width="8" height="6" rx="1"/>
-          </g>
-        </g>
-
-        <!-- Телефон (на столе) -->
-        <g class="obj-group" data-id="phone" onclick="onObjectClick('phone', this)">
-          <rect x="390" y="350" width="25" height="45" fill="#111827" rx="4"/>
-          <rect x="393" y="355" width="19" height="30" fill="#1e3a8a" rx="2"/>
-          <circle cx="402" cy="390" r="3" fill="#374151"/>
-        </g>
-
-        <!-- Подушка (на полу) -->
-        <g class="obj-group" data-id="pillow" onclick="onObjectClick('pillow', this)">
-          <ellipse cx="700" cy="500" rx="60" ry="30" fill="#f3f4f6"/>
-          <path d="M 650 500 Q 700 480 750 500 Q 700 520 650 500" fill="#e5e7eb"/>
-        </g>
-
-        <!-- Часы (на стене) -->
-        <g class="obj-group" data-id="clock" onclick="onObjectClick('clock', this)">
-          <circle cx="600" cy="150" r="30" fill="#f3f4f6" stroke="#374151" stroke-width="4"/>
-          <circle cx="600" cy="150" r="4" fill="#111827"/>
-          <line x1="600" y1="150" x2="600" y2="135" stroke="#111827" stroke-width="3"/>
-          <line x1="600" y1="150" x2="615" y2="150" stroke="#111827" stroke-width="2"/>
-        </g>
-
-      </svg>
+  <!-- ================= QUIZ ================= -->
+  <section id="panel-quiz" class="panel">
+    <div class="toolbar">
+      <div class="bar"><i id="qBar"></i></div>
+      <span class="counter" id="qCount">Question 1 / 10</span>
+      <span class="counter" id="qScore">⭐ 0</span>
     </div>
+    <div id="quizBody"></div>
+  </section>
 
-    <!-- INVENTORY -->
-    <div class="inventory">
-      <div class="inv-title">🎒 Найдено предметов: <span id="invCount">0</span> / 4</div>
-      <div class="inv-slots" id="invSlots">
-        <div class="inv-slot" data-slot="0">?</div>
-        <div class="inv-slot" data-slot="1">?</div>
-        <div class="inv-slot" data-slot="2">?</div>
-        <div class="inv-slot" data-slot="3">?</div>
-      </div>
+  <!-- ================= MATCH ================= -->
+  <section id="panel-match" class="panel">
+    <div class="toolbar">
+      <span class="counter" id="mMoves">Moves: 0</span>
+      <div class="bar"><i id="mBar"></i></div>
+      <span class="counter" id="mPairs">0 / 5 pairs</span>
+      <button class="btn" id="mRestart">🔀 New set</button>
     </div>
+    <div class="tiles" id="mTiles"></div>
+    <div id="mWin"></div>
+  </section>
 
-    <!-- ACTION PANEL (hidden until items found) -->
-    <div class="action-panel" id="actionPanel" style="display:none">
-      <h3 id="actionTitle">Действие</h3>
-      <div class="action-options" id="actionOptions"></div>
-    </div>
-
-  </div>
-
-</div>
-
-<!-- MODAL -->
-<div class="modal-overlay" id="modalOverlay">
-  <div class="modal" id="modalContent"></div>
 </div>
 
 <script>
-/* =========================================================
-   ДАННЫЕ ПРЕДМЕТОВ
-   ========================================================= */
-const ITEMS = {
-  towel:      { emoji:'🧻', name:'Полотенце', isNeeded:true,  slot:0 },
-  flashlight: { emoji:'🔦', name:'Фонарик',   isNeeded:true,  slot:1 },
-  chair:      { emoji:'🪑', name:'Стул',      isNeeded:true,  slot:2 },
-  door:       { emoji:'🚪', name:'Дверь',     isNeeded:true,  slot:3 },
-  tv:         { emoji:'📺', name:'Телевизор' },
-  book:       { emoji:'📚', name:'Книги' },
-  cup:        { emoji:'☕', name:'Чашка' },
-  plant:      { emoji:'🪴', name:'Цветок' },
-  keyboard:   { emoji:'⌨️', name:'Клавиатура' },
-  phone:      { emoji:'📱', name:'Телефон' },
-  pillow:     { emoji:'🛏️', name:'Подушка' },
-  clock:      { emoji:'🕰️', name:'Часы' }
-};
+/* ============ DATA ============ */
+const DATA = [
+  {c:"take a photo",            d:"to use a camera to capture an image"},
+  {c:"take an exam",            d:"to do a test to measure knowledge or ability"},
+  {c:"make a mistake",          d:"to do something incorrectly"},
+  {c:"miss the point",          d:"to not understand the main idea of something"},
+  {c:"miss the bus",            d:"to arrive too late to catch a bus"},
+  {c:"run a business",          d:"to manage or operate a company"},
+  {c:"run a race",              d:"to participate in a running competition"},
+  {c:"tell the truth",          d:"to say what is true"},
+  {c:"tell a story",            d:"to narrate a tale or recount events"},
+  {c:"start an argument",       d:"to begin a disagreement or fight"},
+  {c:"have confidence in",      d:"to trust or believe in someone or something"},
+  {c:"make the most of",        d:"to use an opportunity as well as possible"},
+  {c:"run the risk of",         d:"to do something that might result in a bad outcome"},
+  {c:"take part in",            d:"to participate in an activity"},
+  {c:"bad luck",                d:"unfortunate circumstances or outcomes"},
+  {c:"good news",               d:"information that is positive or happy"},
+  {c:"great success",           d:"achieving a very positive outcome"},
+  {c:"great difficulty",        d:"a lot of trouble or effort"},
+  {c:"heavy rain",              d:"a lot of rain falling"},
+  {c:"heavy traffic",           d:"many vehicles on the road, causing slow movement"},
+  {c:"heavy cold",              d:"a severe cold"},
+  {c:"light rain",              d:"a small amount of rain"},
+  {c:"light meal",              d:"a small, easily digestible meal"},
+  {c:"strong swimmer",          d:"someone who swims well"},
+  {c:"strong coffee",           d:"coffee with a potent taste (high caffeine or strong brew)"},
+  {c:"speak your mind",         d:"to say exactly what you think"},
+  {c:"meet your deadlines",     d:"to finish a task by the required time"},
+  {c:"wait in line",            d:"to stand in a queue"},
+  {c:"lose your temper",        d:"to become angry suddenly"},
+  {c:"keep your promises",      d:"to do what you said you would do"},
+  {c:"make your bed",           d:"to arrange the sheets and blankets neatly"},
+  {c:"break the rules",         d:"to disobey regulations"},
+  {c:"voice your opinion",      d:"to express your thoughts or views"},
+  {c:"take charge",             d:"to take control or lead"},
+  {c:"resolve the dispute",     d:"to settle a disagreement"},
+  {c:"remain calm",             d:"to stay peaceful and not get upset"},
+  {c:"take an interest in",     d:"to become curious or concerned about something"},
+  {c:"make time for",           d:"to prioritize an activity despite being busy"},
+  {c:"return the favour",       d:"to do something helpful for someone who helped you"},
+  {c:"make sense",              d:"to be logical or understandable"}
+];
 
-/* =========================================================
-   СОСТОЯНИЕ
-   ========================================================= */
-const game = {
-  active: false,
-  timeLeft: 300,
-  timerId: null,
-  foundItems: new Set(),
-  step: 1
-};
-
+/* ============ HELPERS ============ */
 const $ = id => document.getElementById(id);
+const shuffle = a => { for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; };
 
-/* =========================================================
-   СТАРТ
-   ========================================================= */
-function startGame(){
-  $('startScreen').style.display = 'none';
-  $('gameScreen').style.display = 'block';
+/* ============ SOUND ============ */
+let audioCtx = null;
+function tone(freq, dur, delay, type, vol){
+  try{
+    audioCtx = audioCtx || new (window.AudioContext||window.webkitAudioContext)();
+    const t0 = audioCtx.currentTime + (delay||0);
+    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+    o.type = type || 'sine';
+    o.frequency.setValueAtTime(freq, t0);
+    g.gain.setValueAtTime(vol || 0.05, t0);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start(t0); o.stop(t0 + dur);
+  }catch(e){}
+}
+const sfxGood = () => { tone(660,.09,0,'sine',.06); tone(990,.13,.08,'sine',.05); };
+const sfxBad  = () => { tone(180,.18,0,'sawtooth',.05); };
+const sfxWin  = () => { [523,659,784,1047].forEach((f,i)=>tone(f,.16,i*.09,'sine',.055)); };
 
-  game.active = true;
-  game.timeLeft = 300;
-  game.foundItems.clear();
-  game.step = 1;
+/* ============ TABS ============ */
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.onclick = () => {
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    tab.classList.add('active');
+    $('panel-' + tab.dataset.mode).classList.add('active');
+    if(tab.dataset.mode === 'quiz' && quiz.qs.length === 0) startQuiz();
+    if(tab.dataset.mode === 'match' && match.tiles.length === 0) startMatch();
+  };
+});
 
-  // Сброс интерфейса
-  $('invCount').textContent = '0';
-  document.querySelectorAll('.inv-slot').forEach(s => {
-    s.textContent = '?';
-    s.classList.remove('filled');
+/* ==================================================
+   MODE 1 — FLASHCARDS
+================================================== */
+let sOrder = DATA.map((_,i)=>i);
+let sIdx = 0;
+const flipCard = $('flipCard');
+
+function renderStudy(){
+  const item = DATA[sOrder[sIdx]];
+  $('sFront').textContent = item.c;
+  $('sBack').textContent  = item.d;
+  $('sCounter').textContent = `${sIdx+1} / ${sOrder.length}`;
+  $('sBar').style.width = ((sIdx+1)/sOrder.length*100) + '%';
+  flipCard.classList.remove('flipped');
+}
+function stepStudy(n){ sIdx = (sIdx + n + sOrder.length) % sOrder.length; renderStudy(); }
+
+flipCard.onclick = () => flipCard.classList.toggle('flipped');
+$('sFlip').onclick  = () => flipCard.classList.toggle('flipped');
+$('sNext').onclick  = () => stepStudy(1);
+$('sPrev').onclick  = () => stepStudy(-1);
+$('sShuffle').onclick = () => {
+  shuffle(sOrder); sIdx = 0;
+  renderStudy();
+  $('sShuffle').textContent = '✅ Shuffled';
+  setTimeout(()=> $('sShuffle').textContent = '🔀 Shuffle', 900);
+};
+document.addEventListener('keydown', e=>{
+  if(!$('panel-study').classList.contains('active')) return;
+  if(e.key === 'ArrowRight') stepStudy(1);
+  if(e.key === 'ArrowLeft')  stepStudy(-1);
+  if(e.key === ' ')          { e.preventDefault(); flipCard.classList.toggle('flipped'); }
+});
+renderStudy();
+
+/* ==================================================
+   MODE 2 — QUIZ
+================================================== */
+const QUIZ_LEN = 10;
+let quiz = { qs:[], i:0, score:0, answered:false };
+
+function startQuiz(){
+  const pool = shuffle([...DATA]).slice(0, QUIZ_LEN);
+  quiz.qs = pool.map(item => {
+    const dir = Math.random() < 0.5 ? 'def2col' : 'col2def';
+    const others = shuffle(DATA.filter(x => x.c !== item.c)).slice(0, 3);
+    if(dir === 'def2col'){
+      return { dir, question: item.d, correct: item.c,
+               options: shuffle([item.c, ...others.map(o=>o.c)]) };
+    }
+    return   { dir, question: item.c, correct: item.d,
+               options: shuffle([item.d, ...others.map(o=>o.d)]) };
   });
-  $('actionPanel').style.display = 'none';
-  $('step-1').className = 'step-pill active';
-  $('step-2').className = 'step-pill';
-  $('step-3').className = 'step-pill';
-
-  // Сброс объектов в SVG
-  document.querySelectorAll('.obj-group').forEach(el => {
-    el.classList.remove('found');
-  });
-
-  updateTimerDisplay();
-  startTimer();
+  quiz.i = 0; quiz.score = 0; quiz.answered = false;
+  renderQuiz();
 }
 
-/* =========================================================
-   КЛИК ПО ОБЪЕКТУ
-   ========================================================= */
-function onObjectClick(id, el){
-  if(!game.active) return;
-  if(game.foundItems.has(id)) return;
-  
-  const item = ITEMS[id];
-  if(!item) return;
+function renderQuiz(){
+  const total = quiz.qs.length;
 
-  if(item.isNeeded){
-    // Правильный предмет
-    el.classList.add('found');
-    game.foundItems.add(id);
-    
-    // Заполняем слот
-    const slot = document.querySelector(`.inv-slot[data-slot="${item.slot}"]`);
-    if(slot){
-      slot.textContent = item.emoji;
-      slot.classList.add('filled');
-    }
-    
-    $('invCount').textContent = game.foundItems.size;
-    $('foundStat').textContent = `🔍 ${game.foundItems.size} / 4`;
-    
-    // Проверка на завершение сбора
-    if(game.foundItems.size === 4){
-      setTimeout(() => {
-        goToStep2();
-      }, 600);
-    }
+  if(quiz.i >= total){ renderQuizResults(); return; }
+
+  const q = quiz.qs[quiz.i];
+  $('qBar').style.width   = (quiz.i / total * 100) + '%';
+  $('qCount').textContent = `Question ${quiz.i+1} / ${total}`;
+  $('qScore').textContent = `⭐ ${quiz.score}`;
+
+  const tag = q.dir === 'def2col'
+      ? 'WHICH COLLOCATION MEANS…'
+      : 'WHAT DOES THIS COLLOCATION MEAN?';
+
+  const body = $('quizBody');
+  body.innerHTML = `
+    <div class="question">
+      <div class="qtag">${tag}</div>
+      <h3>${q.question}</h3>
+    </div>
+    <div id="opts"></div>`;
+
+  const opts = $('opts');
+  q.options.forEach(opt => {
+    const b = document.createElement('button');
+    b.className = 'option';
+    b.textContent = opt;
+    b.onclick = () => answerQuiz(b, opt, q);
+    opts.appendChild(b);
+  });
+}
+
+function answerQuiz(btn, opt, q){
+  if(quiz.answered) return;
+  quiz.answered = true;
+
+  [...$('opts').children].forEach(b => {
+    if(b.textContent === q.correct) b.classList.add('correct');
+  });
+
+  if(opt === q.correct){ quiz.score++; sfxGood(); }
+  else { btn.classList.add('wrong'); sfxBad(); }
+
+  const total = quiz.qs.length;
+  $('qBar').style.width   = ((quiz.i + 1) / total * 100) + '%';
+  $('qScore').textContent = `⭐ ${quiz.score}`;
+
+  setTimeout(() => {
+    quiz.i++;
+    quiz.answered = false;
+    renderQuiz();
+  }, 1250);
+}
+
+function renderQuizResults(){
+  const total = quiz.qs.length;
+  const pct = quiz.score / total;
+  const msg = pct === 1   ? "Perfect score! You're a collocation master 🏆"
+            : pct >= 0.8  ? "Excellent work! 🌟"
+            : pct >= 0.6  ? "Good job — almost there! 👍"
+            : pct >= 0.4  ? "Not bad. Keep practising! 💪"
+            : "Every try makes you better 🚀";
+  $('qBar').style.width = '100%';
+  $('qCount').textContent = `Done!`;
+  $('quizBody').innerHTML = `
+    <div class="results">
+      <div class="score-ring">${quiz.score}/${total}</div>
+      <p class="msg">${msg}</p>
+      <button class="btn primary" id="quizAgain">Play again 🔁</button>
+    </div>`;
+  $('quizAgain').onclick = startQuiz;
+  if(pct >= 0.8) sfxWin();
+}
+
+/* ==================================================
+   MODE 3 — MATCH
+================================================== */
+const PAIRS = 5;
+let match = { tiles:[], selected:[], matched:0, moves:0, lock:false };
+
+function startMatch(){
+  const pool = shuffle([...DATA]).slice(0, PAIRS);
+  match.tiles = [];
+  pool.forEach((item, idx) => {
+    match.tiles.push({ id: idx, type: 'col', text: item.c });
+    match.tiles.push({ id: idx, type: 'def', text: item.d });
+  });
+  shuffle(match.tiles);
+  match.selected = []; match.matched = 0; match.moves = 0; match.lock = false;
+  $('mWin').innerHTML = '';
+  renderMatch();
+}
+
+function renderMatch(){
+  $('mMoves').textContent = 'Moves: ' + match.moves;
+  $('mPairs').textContent = `${match.matched} / ${PAIRS} pairs`;
+  $('mBar').style.width   = (match.matched / PAIRS * 100) + '%';
+
+  const box = $('mTiles');
+  box.innerHTML = '';
+  match.tiles.forEach((t, i) => {
+    const el = document.createElement('div');
+    el.className = 'tile';
+    el.dataset.idx = i;
+    el.textContent = t.text;
+    el.onclick = () => clickTile(el, i);
+    box.appendChild(el);
+  });
+}
+
+function clickTile(el, i){
+  if(match.lock) return;
+  if(el.classList.contains('matched') || el.classList.contains('sel')) return;
+
+  el.classList.add('sel');
+  match.selected.push({ el, tile: match.tiles[i] });
+
+  if(match.selected.length < 2) return;
+
+  match.moves++;
+  $('mMoves').textContent = 'Moves: ' + match.moves;
+
+  const [a, b] = match.selected;
+
+  if(a.tile.id === b.tile.id){
+    a.el.classList.remove('sel'); b.el.classList.remove('sel');
+    a.el.classList.add('matched'); b.el.classList.add('matched');
+    match.matched++;
+    match.selected = [];
+    sfxGood();
+    $('mPairs').textContent = `${match.matched} / ${PAIRS} pairs`;
+    $('mBar').style.width   = (match.matched / PAIRS * 100) + '%';
+    if(match.matched === PAIRS) setTimeout(showMatchWin, 420);
   } else {
-    // Отвлекающий предмет
-    el.classList.add('wrong');
-    setTimeout(() => el.classList.remove('wrong'), 500);
-    
-    showModal(
-      '⚠️ Ошибка!',
-      `Предмет "${item.name}" не поможет при пожаре. Время уходит!`,
-      '😰',
-      [{ text: 'Продолжить поиск', action: closeModal }]
-    );
-    
-    // Штраф — 15 секунд
-    game.timeLeft = Math.max(0, game.timeLeft - 15);
-    updateTimerDisplay();
+    match.lock = true;
+    a.el.classList.add('bad'); b.el.classList.add('bad');
+    sfxBad();
+    setTimeout(() => {
+      a.el.classList.remove('sel','bad');
+      b.el.classList.remove('sel','bad');
+      match.selected = []; match.lock = false;
+    }, 680);
   }
 }
 
-/* =========================================================
-   ШАГ 2: ПРОВЕРКА ДВЕРИ
-   ========================================================= */
-function goToStep2(){
-  game.step = 2;
-  $('step-1').className = 'step-pill done';
-  $('step-2').className = 'step-pill active';
-  
-  $('actionPanel').style.display = 'block';
-  $('actionTitle').textContent = '🚪 Шаг 2: Проверка двери';
-  
-  const options = $('actionOptions');
-  options.innerHTML = `
-    <div class="action-option" onclick="checkDoor('backhand')">
-      <span>🖐️</span> Проверить дверь <b>тыльной стороной ладони</b>
-    </div>
-    <div class="action-option" onclick="checkDoor('open')">
-      <span>🚪</span> Сразу открыть дверь
-    </div>
-    <div class="action-option" onclick="checkDoor('look')">
-      <span>👀</span> Посмотреть в дверной глазок
-    </div>
-  `;
+function showMatchWin(){
+  sfxWin();
+  const perfect = match.moves <= PAIRS + 2;
+  $('mWin').innerHTML = `
+    <div class="win">
+      <h4>${perfect ? '🏆 Flawless memory!' : '🎉 All pairs matched!'}</h4>
+      <p>You did it in <strong>${match.moves}</strong> moves.</p>
+      <button class="btn primary" id="mAgain">Play again 🔁</button>
+    </div>`;
+  $('mAgain').onclick = startMatch;
 }
 
-/* =========================================================
-   ПРОВЕРКА ДВЕРИ
-   ========================================================= */
-function checkDoor(action){
-  if(action === 'backhand'){
-    showModal(
-      '✅ Верно!',
-      'Дверь холодная — значит, огонь далеко. Ты проверил её тыльной стороной ладони, как и требуют правила. Можно выходить.',
-      '🖐️',
-      [{ text: 'Выйти из кабинета', action: () => { closeModal(); goToStep3(); } }]
-    );
-  } else if(action === 'open'){
-    die('Ты открыл дверь, не проверив её температуру. За дверью оказалось пламя — ожоги несовместимы с жизнью.');
-  } else if(action === 'look'){
-    die('Ты посмотрел в глазок, но дверь уже раскалилась. При прикосновении к металлической части ты получил сильный ожог.');
-  }
-}
+$('mRestart').onclick = startMatch;
 
-/* =========================================================
-   ШАГ 3: ВЫХОД
-   ========================================================= */
-function goToStep3(){
-  game.step = 3;
-  $('step-2').className = 'step-pill done';
-  $('step-3').className = 'step-pill active';
-  
-  $('actionTitle').textContent = '🏃 Шаг 3: Выход из здания';
-  
-  const options = $('actionOptions');
-  options.innerHTML = `
-    <div class="action-option" onclick="exitBuilding('stairs')">
-      <span>🪜</span> Спуститься по лестнице, пригнувшись, с мокрым полотенцем на лице
-    </div>
-    <div class="action-option" onclick="exitBuilding('elevator')">
-      <span>🛗</span> Вызвать лифт и спуститься на нём
-    </div>
-    <div class="action-option" onclick="exitBuilding('window')">
-      <span>🪟</span> Разбить окно и прыгнуть вниз
-    </div>
-    <div class="action-option" onclick="exitBuilding('wait')">
-      <span>⏳</span> Остаться в кабинете и ждать спасателей
-    </div>
-  `;
-}
-
-/* =========================================================
-   ВЫХОД
-   ========================================================= */
-function exitBuilding(action){
-  if(action === 'stairs'){
-    win();
-  } else if(action === 'elevator'){
-    die('Во время пожара лифт — смертельная ловушка. Он может остановиться на горящем этаже или отключиться из-за перебоев с электричеством.');
-  } else if(action === 'window'){
-    die('Прыжок с 5-го этажа несовместим с жизнью. Разбивать окно можно только в крайнем случае и только для подачи сигнала, а не для прыжка.');
-  } else if(action === 'wait'){
-    die('Ты остался в кабинете, но дым уже проник внутрь. Ожидание без подачи сигнала и защиты дыхания привело к отравлению угарным газом.');
-  }
-}
-
-/* =========================================================
-   ТАЙМЕР
-   ========================================================= */
-function startTimer(){
-  if(game.timerId) clearInterval(game.timerId);
-  game.timerId = setInterval(() => {
-    if(!game.active) return;
-    game.timeLeft--;
-    updateTimerDisplay();
-    
-    if(game.timeLeft <= 60){
-      $('timerStat').classList.add('danger');
-    }
-    
-    if(game.timeLeft <= 0){
-      clearInterval(game.timerId);
-      die('Время вышло! Дым заполнил кабинет, и ты потерял сознание. Пожарные не успели.');
-    }
-  }, 1000);
-}
-
-function updateTimerDisplay(){
-  const m = Math.floor(game.timeLeft / 60);
-  const s = game.timeLeft % 60;
-  $('timerStat').textContent = `⏱ ${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-}
-
-/* =========================================================
-   ПОБЕДА / СМЕРТЬ
-   ========================================================= */
-function win(){
-  game.active = false;
-  clearInterval(game.timerId);
-  $('timerStat').classList.remove('danger');
-  
-  const timeSpent = 300 - game.timeLeft;
-  const m = Math.floor(timeSpent / 60);
-  const s = timeSpent % 60;
-  
-  showModal(
-    '🎉 Ты спасён!',
-    `Ты выбрался из горящего здания за ${m} мин ${s} сек, соблюдая все правила пожарной безопасности. Ты молодец!`,
-    '🏆',
-    [
-      { text: '🔄 Играть снова', action: () => { closeModal(); resetGame(); }, cls: 'green' }
-    ]
-  );
-}
-
-function die(reason){
-  game.active = false;
-  clearInterval(game.timerId);
-  
-  showModal(
-    '💀 Ты погиб',
-    reason,
-    '🔥',
-    [
-      { text: '🔄 Попробовать снова', action: () => { closeModal(); resetGame(); }, cls: 'fire' }
-    ]
-  );
-}
-
-/* =========================================================
-   МОДАЛЬНОЕ ОКНО
-   ========================================================= */
-function showModal(title, text, emoji, buttons){
-  $('modalContent').innerHTML = `
-    <div class="modal-emoji">${emoji}</div>
-    <h2>${title}</h2>
-    <p>${text}</p>
-    <div class="btn-row">
-      ${buttons.map(b => `<button class="btn ${b.cls||''}" onclick="handleModalBtn('${b.text}')">${b.text}</button>`).join('')}
-    </div>
-  `;
-  window._modalButtons = buttons;
-  $('modalOverlay').classList.add('show');
-}
-
-function handleModalBtn(text){
-  const btn = window._modalButtons.find(b => b.text === text);
-  if(btn && btn.action) btn.action();
-}
-
-function closeModal(){
-  $('modalOverlay').classList.remove('show');
-}
-
-/* =========================================================
-   РЕСТАРТ
-   ========================================================= */
-function resetGame(){
-  game.active = false;
-  if(game.timerId) clearInterval(game.timerId);
-  closeModal();
-  $('gameScreen').style.display = 'none';
-  $('startScreen').style.display = 'block';
-  $('timerStat').classList.remove('danger');
-}
+/* init quiz lazily so tab click starts it */
 </script>
 </body>
 </html>
